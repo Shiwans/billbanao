@@ -1,0 +1,48 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body{
+    margin:0;
+    padding:0;
+    box-sizing: border-box;
+}
+
+.table{
+    /* table-auto border-collapse	grid auto-cols-max border gap-x-1	justify-between	*/
+    border: 1px solid black;
+    border-collapse: collapse;
+    width:80%;
+    margin: 20px;
+    margin-left: 10%;
+}
+.table th,td{
+    border: 1px solid black;
+    padding: 5px;
+}
+.table th{
+    text-align: left;
+}
+
+th:first-child {
+    background-color: yellow;
+    width:30%;
+  }
+
+th:last-child{
+    width: 22%;
+}
+
+td:last-child button{
+    border: 1px solid black;
+    margin-left: 12px;
+    padding: 0px 5px 0px;
+}
+
+tr:nth-child(even) {
+    background-color: #D6EEEE;
+}
+
+th:nth-child(4),td:nth-child() {
+    background-color: rgba(30, 30, 30, 0);
+  }
