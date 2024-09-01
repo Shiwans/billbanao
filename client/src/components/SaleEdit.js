@@ -12,6 +12,7 @@ function SaleEdit({cust, onSub}){
 
 
     const handleNameChange = (e)=>{
+        console.log(e.target.value)
         setName(e.target.value)
         // console.log({name})
     }

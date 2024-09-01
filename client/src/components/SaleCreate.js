@@ -8,10 +8,11 @@ function SaleCreate({onSubmit}){
     const [jama,setJama] = useState();
     const handleSubmit=(e)=>{
         e.preventDefault();
-        onSubmit(name,quantity,price,jama);
-            // axios.post("http://localhost:4000/sales",{name,quantity,price,jama}).then(response=>{
-            //     console.log('added successfully')
-            // })
+        // onSubmit(name,quantity,price,jama);
+            axios.post("http://localhost:4000/",{name,quantity,price,jama}).then(
+                console.log('added successfully')
+            )
+        
     }
 
     const handleNameChange = (e)=>{

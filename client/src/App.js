@@ -1,59 +1,86 @@
-import './App.css'
-import SaleCreate from './components/SaleCreate';
-import SaleShow from './components/SaleShow';
-import {  useState } from 'react';
-function App(){
-  const [show,setShow] = useState(false)
-  const [customers,setCustomers] = useState([]);
-  const handleClick=()=>{
-    setShow(!show)
-  }
+import "./App.css";
+import SaleCreate from "./components/SaleCreate";
+import SaleShow from "./components/SaleShow";
+import { useEffect, useState } from "react";
+import axios from "axios";
+function App() {
+  const [show, setShow] = useState(false);
+  const [customers, setCustomers] = useState([]);
 
-  const handleSubmit=(name,quantity,price,jama)=>{
+  useEffect(()=>{
+    rendereCustomer()
+  });
+
+  const handleClick = () => {
+    setShow(!show);
+  };
+
+  const handleSubmit = (name, quantity, price, jama) => {
     setShow(false);
-    setCustomers([...customers,{id:Math.round(Math.random() * 9999),name:name,quantity:quantity,price:price,jama:jama}])
-  }
+    setCustomers([
+      ...customers,
+      {
+        id: Math.round(Math.random() * 9999),
+        name: name,
+        quantity: quantity,
+        price: price,
+        jama: jama,
+      },
+    ]);
+  };
 
-  const editSales = (id,name,quantity,price,jama)=>{
+  const editSales = (id, name, quantity, price, jama) => {
     //edit sales
-    const updatedSales=customers.map((customer)=>{
-      if(customer.id === id){
-        return {...customers,id,name,quantity,price,jama}
-        }
-    })
-    setCustomers(updatedSales)
-  }
+    const updatedSales = customers.map((customer) => {
+      if (customer.id === id) {
+        return { ...customers, id, name, quantity, price, jama };
+      }
+    });
+    setCustomers(updatedSales);
+  };
 
   //delete  //FKT
-  const deleteSale = (id)=>{
-    const deleteS = customers.filter((customer)=>{
-      if(customer.id !== id){
-        return {...customers,customer}
+  const deleteSale = (id) => {
+    const deleteS = customers.filter((customer) => {
+      if (customer.id !== id) {
+        return { ...customers, customer };
       }
+    });
+    setCustomers(deleteS);
+  };
+
+  const rendereCustomer =async()=>{
+    let data =await axios.get('http://localhost:4000/').then((response)=>{
+      // response.map((customer)=>{
+      //     return <SaleShow cust={customer} editSale={editSales} deleteSale={deleteSale} />
+      //   })
+      console.log('response from App',response)
     })
-    setCustomers(deleteS)
+    data.map((customer) => {
+      return (
+        <SaleShow
+          cust={customer}
+          editSale={editSales}
+          deleteSale={deleteSale}
+        />
+      );
+    });
   }
-
-  const rendereCustomer = customers.map((customer)=>{
-    return <SaleShow cust={customer} editSale={editSales} deleteSale={deleteSale} />
-  })
-
   let content = <div></div>;
   if (show) {
-    content = <SaleCreate onSubmit={handleSubmit}/>;
+    content = <SaleCreate onSubmit={handleSubmit} />;
   }
-
-  return(
-    <div className="h-screen w-3/4	mx-44 my-6" >
+  return (
+    <div className="h-screen w-3/4	mx-44 my-6">
       <div className="flex justify-between m-8">
-        <button className="bg-gray-300 rounded-lg w-18" onClick={handleClick}>Add customer</button>
+        <button className="bg-gray-300 rounded-lg w-18" onClick={handleClick}>
+          Add customer
+        </button>
         <input className="bg-gray-200" type="date" name="Date"></input>
       </div>
-      <div>
-        {content}
-      </div>
+      <div>{content}</div>
       <table className="table">
-      {/* border-collapse */}
+        {/* border-collapse */}
         <thead>
           <tr>
             <th>Name</th>
@@ -64,13 +91,10 @@ function App(){
             <th></th>
           </tr>
         </thead>
-        <tbody>
-          {rendereCustomer}
-        </tbody>
+        <tbody>{rendereCustomer}</tbody>
       </table>
     </div>
-  )
-  
+  );
 }
 
 export default App;
