@@ -1,0 +1,38 @@
+/* components/Navbar.css */
+.navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 200px; /* Adjust based on your design */
+    height: 100vh;
+    background-color: #333;
+    color: white;
+    padding: 20px;
+    box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+    overflow-y: auto;
+    z-index: 1000; /* Ensures the navbar is above other content */
+  }
+  
+  .navbar h2 {
+    margin-top: 0;
+  }
+  
+  .navbar ul {
+    list-style-type: none;
+    padding: 0;
+  }
+  
+  .navbar ul li {
+    margin: 10px 0;
+  }
+  
+  .navbar ul li a {
+    color: white;
+    text-decoration: none;
+    font-size: 16px;
+  }
+  
+  .navbar ul li a:hover {
+    text-decoration: underline;
+  }
+  

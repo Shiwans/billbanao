@@ -1,0 +1,126 @@
+.admin-container {
+    display: flex;
+  }
+  
+  .sidebar {
+    width: 20vw;
+    background-color: #088233;
+    padding: 10px;
+    color: black;
+    height: 100vh;
+  }
+  
+  .sidebar button {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    border: none;
+    background-color: #ddd;
+    border-radius: 4px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    font-size: 16px;
+    text-align: left;
+  }
+  
+  .sidebar button:hover {
+    background-color: #ccc;
+  }
+  
+  .content {
+    flex: 1;
+
+  }
+  
+  .dashboard, .manage-users, .settings {
+    background-color: #088233;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .manage-users {
+    background-color: #088233;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .search-container {
+    display: flex;
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  
+  .search-input {
+    border: none;
+    padding: 10px;
+    font-size: 16px;
+    width: 200px;
+    outline: none;
+  }
+  
+  .search-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 10px;
+  }
+  
+  .search-button img {
+    width: 20px;
+    height: 20px;
+  }
+  
+  .search-container button{
+    padding-left:20px;
+    margin-bottom: 20px;
+  }
+  
+  .manage-users h2{
+    color :black;
+  }
+  
+  
+  
+  .filter-container {
+    display: flex;
+    align-items: left;
+    background-color: #0da442;
+    border-radius: 4px;
+    padding: 10px;
+  }
+  
+  .filter-select {
+    margin-left: 5px;
+    padding: 5px;
+    margin-bottom: 20px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    outline: none;
+    cursor: pointer;
+    color: black;
+  }
+  
+  .filter-select:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 0.2rem rgba(38, 143, 255, 0.25);
+  }
+  
+  .manage-users h2{
+    padding-top: 10px;
+  }
+  
+  
+  .filter{
+    display: flex;
+    gap :10px;
+  }
+  
+  .search-container{
+    width:1000px;
+  }
+  .filter-container{
+    width :30%;
+  }
