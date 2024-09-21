@@ -1,0 +1,79 @@
+/* Container Styling */
+.dashboard {
+  padding: 20px;
+  margin: 0 auto;
+  max-width: 1200px; /* Ensure the dashboard does not stretch too wide */
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Row Styling */
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+/* Card Styling */
+.card {
+  flex: 1;
+  min-width: 250px;
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  padding: 16px; /* Added padding inside the card */
+}
+
+/* Card Content Styling */
+.card-content {
+  padding: 20px;
+}
+
+/* Title Styling */
+.card-title {
+  font-size: 1.25rem;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+/* Amount Styling */
+.amount {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #4caf50; /* Green color for emphasis */
+  margin-bottom: 5px;
+}
+
+/* Count Styling */
+.count {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #2196f3; /* Blue color for emphasis */
+  margin-bottom: 5px;
+}
+
+/* Description Styling */
+.description {
+  color: #555555;
+  margin-bottom: 10px;
+}
+
+/* Growth Styling */
+.growth {
+  color: #f44336; /* Red color for negative growth */
+}
+
+/* Responsive Design */
+@media (max-width: 900px) {
+  .row {
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 600px) {
+  .card {
+    min-width: auto;
+  }
+}

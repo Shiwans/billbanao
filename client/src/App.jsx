@@ -1,10 +1,8 @@
 import React from "react";
-// import Home from "./pages/HomePage/Home";
 import { Routes, Route } from "react-router-dom";
 import Dashboard from "./pages/dashboard";
 import Customer from "./pages/customer";
 import Supplier from "./pages/supplier";
-import Expense from "./pages/expense";
 import Sale from "./pages/sale";
 import Payment from "./pages/payment";
 import Reports from "./pages/reports";
@@ -24,7 +22,6 @@ const App = () => {
           <Route path="/" element={<Dashboard />} />
           <Route path="/customer" element={<Customer />} />
           <Route path="/supplier" element={<Supplier />} />
-          <Route path="/expense" element={<Expense />} />
           <Route path="/sale" element={<Sale />} />
           <Route path="/payment" element={<Payment />} />
           <Route path="/report" element={<Reports />} />

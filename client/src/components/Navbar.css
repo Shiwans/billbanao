@@ -1,16 +1,15 @@
-/* components/Navbar.css */
+/* components/Navbar.css */ 
 .navbar {
     position: fixed;
     top: 0;
     left: 0;
-    width: 200px; /* Adjust based on your design */
     height: 100vh;
     background-color: #333;
     color: white;
     padding: 20px;
     box-shadow: 2px 0 5px rgba(0,0,0,0.1);
     overflow-y: auto;
-    z-index: 1000; /* Ensures the navbar is above other content */
+    z-index: 1000; 
   }
   
   .navbar h2 {

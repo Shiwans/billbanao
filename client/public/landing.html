@@ -1,0 +1,76 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="./favi.ico" />
+    <title>Welcome to BillBanao</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .container {
+            text-align: center;
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+        p {
+            margin-bottom: 30px;
+            color: #666;
+        }
+        .login-button {
+            padding: 15px 30px;
+            background-color: #4285F4; /* Google blue */
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        .login-button:hover {
+            background-color: #357ae8;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Welcome to BillBanao</h1>
+        <p>Your one-stop solution for managing your business records!</p>
+        <button class="login-button" onclick="window.location.href='/auth/google'">Login with Google</button>
+    </div>
+    <script>
+        window.onload = function() {
+            const token = localStorage.getItem('token');
+            if (token) {
+                // Token exists, redirect to the dashboard
+                window.location.href = 'http://localhost:3000/supplier'; // Update with your dashboard route
+            } else {
+                // Check URL for a new token
+                const urlParams = new URLSearchParams(window.location.search);
+                const newToken = urlParams.get('token');
+                if (newToken) {
+                    localStorage.setItem('token', newToken); // Store the JWT
+                    // Redirect to the dashboard after storing the token
+                    window.location.href = 'http://localhost:3000/supplier'; // Update with your dashboard route
+                }
+            }
+        };
+    </script>
+    
+</body>
+</html> -->

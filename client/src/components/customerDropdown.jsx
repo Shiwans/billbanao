@@ -1,6 +1,5 @@
 import React,{useState,useEffect} from "react";
 
-
 const CustomerDropdown = () => {
   const [customerList, setCustomerList] = useState([]);
   useEffect(() => {

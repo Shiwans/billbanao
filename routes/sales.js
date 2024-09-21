@@ -10,6 +10,7 @@ const saleController = require('../controller/saleController')
 //description:-   add a sale
 //route:-  POST /sales
 router.post('/',saleController.postData)
+
 router.get('/',saleController.fetchQuery)
 router.get('/day',saleController.fetchDay)
 router.get('/customer',saleController.fetchCustomer)

@@ -1,30 +1,108 @@
-const mongoose = require('mongoose')
+// const mongoose = require('mongoose');
+
+// const customerSchema = new mongoose.Schema({
+//     name: {
+//         type: String,
+//         required: true
+//     },
+//     contactInfo: {
+//         phone: {
+//             type: Number,
+//             required: true
+//         },
+//         email: {
+//             type: String,
+//             default: 'shiwans.vaishya@gmail.com'
+//         },
+//         address: {
+//             type: String,
+//             required: true
+//         }
+//     },
+//     type: {
+//         type: String,
+//     },
+//     totalAmount: {
+//         type: Number,
+//         default: 0 // Total amount of goods purchased
+//     },
+//     totalJama: {
+//         type: Number,
+//         default: 0 // Total amount paid
+//     },
+//     totalDue: {
+//         type: Number,
+//         default: 0 // Total left to take
+//     },
+//     createdAt: {
+//         type: Date,
+//         default: Date.now
+//     },
+//     sales: [{
+//         type: mongoose.Schema.Types.ObjectId,
+//         ref: 'Sale' // Reference to sales related to this customer
+//     }],
+//     payments: [{
+//         type: mongoose.Schema.Types.ObjectId,
+//         ref: 'Payment' // Reference to payments related to this customer
+//     }]
+// });
+
+// module.exports = mongoose.model('Customer', customerSchema);
+
+const mongoose = require('mongoose');
 
 const customerSchema = new mongoose.Schema({
-    name:{
-        type:String,
-        required:true
+    userId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User', // Reference to the User model
+        required: true // Ensure that every customer is associated with a user
     },
-    contactInfo:{
-        phone:Number,
-        email:{type:String,default:'shiwans.vaishya@gmail.com'},
-        address:String,
+    name: {
+        type: String,
+        required: true
     },
-    type:String,
-    totalPurchases:{type:Number,default:0},// total value of purchases
-    outstandingAmount:{type:Number,default:0},//Total amount they owe
-    createdAt: {type:Date,default:Date.now}
+    contactInfo: {
+        phone: {
+            type: Number,
+            required: true
+        },
+        email: {
+            type: String,
+            default: 'shiwans.vaishya@gmail.com'
+        },
+        address: {
+            type: String,
+            required: true
+        }
+    },
+    type: {
+        type: String,
+    },
+    totalAmount: {
+        type: Number,
+        default: 0 // Total amount of goods purchased
+    },
+    totalJama: {
+        type: Number,
+        default: 0 // Total amount paid
+    },
+    totalDue: {
+        type: Number,
+        default: 0 // Total left to take
+    },
+    createdAt: {
+        type: Date,
+        default: Date.now
+    },
+    sales: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Sale' // Reference to sales related to this customer
+    }],
+    payments: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Payment' // Reference to payments related to this customer
+    }]
+});
 
-    // paymentHistory:[
-    //     {
-    //         date:Date,
-    //         quantity:Number,
-    //         price:Number,
-    //         amount:Number
-    //         // total jama 
-    //     }
-    // ],
-    // Total due amount
-})
-
-module.exports = mongoose.model('Customer',customerSchema)
+module.exports = mongoose.model('Customer', customerSchema);

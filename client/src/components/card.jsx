@@ -9,7 +9,7 @@ const TextExample=({customer})=> {
         <Card.Subtitle className="mb-2 text-muted">{contactInfo.phone
           }</Card.Subtitle>
         <Card.Text>
-          {contactInfo.address}{contactInfo.email}
+          {contactInfo.upi}{contactInfo.email}
         </Card.Text>
       </Card.Body>
     </Card>

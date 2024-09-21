@@ -1,5 +1,4 @@
 import React from 'react'
-import Buttons from "../components/buttons"
 
 const Reports = () => {
   return (
@@ -13,7 +12,6 @@ const Reports = () => {
             <li>sales day-wise report</li>
             <li>purchase day-wise report</li>
         </ul>
-        <Buttons />
     </div>
   )
 }

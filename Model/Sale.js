@@ -1,40 +1,66 @@
-const mongoose = require('mongoose')
-const Schema = mongoose.Schema;  // Define Schema from mongoose
+const mongoose = require('mongoose');
+const Schema = mongoose.Schema; 
 
 const salesSchema = new mongoose.Schema({
-    // customerId: {
-    //   type: Schema.Types.ObjectId,
+    // userId: {
+    //     type: mongoose.Schema.Types.ObjectId,
+    //     ref: 'User',
+    //     required: true // Ensure every sale is associated with a user
     // },
-    customerName:{type:String},
-    date:{
-      type:String,//inorder to format it to YYYY-MM-DD
+    customerId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Customer',
+        required: true
     },
-    quantity: {type:Number, require:true},
-    price: {type:Number, require:true},
-    amount: Number,
+    customerName: {
+        type: String,
+        required:true
+    },
+    date: {
+        type: String, // Format it to YYYY-MM-DD
+        required:true
+    },
+    quantity: {
+        type: Number,
+        required: true,
+    },
+    price: {
+        type: Number,
+        required: true,
+    },
+    amount: {
+        type: Number,
+        required:true
+    },
     paymentStatus: {
-      type:String,
-      enum: ['paid','partial','unpaid'] 
+        type: String,
+        enum: ['paid', 'partial', 'unpaid'],
     },
-    paymentDetails:{
-      paidAmount:{type:Number,},
-      dueAmount:{type:Number,}
+    paymentDetails: {
+        paidAmount: {
+            type: Number,
+        },
+        dueAmount: {
+            type: Number,
+        },
     },
-    type:{
-      type:String,
-    },
-    createdAt: {type:Date,default:Date.now}
+    type: {
+        type: String,
 
+    },
+    createdAt: {
+        type: Date,
+        default: Date.now,
+    },
 });
 
-//pre-save to format date
-salesSchema.pre('save',function(next){
-  if(this.date){
-    const formattedDate = new Date(this.date).toISOString().split('T')[0]
-    this.date = formattedDate
-  }
-  next()
-  
-})
+// Pre-save to format date
+salesSchema.pre('save', function(next) {
+    if (this.date) {
+        const formattedDate = new Date(this.date).toISOString().split('T')[0];
+        this.date = formattedDate;
+    }
+    next();
+});
 
-module.exports = mongoose.model('Sale',salesSchema)
+module.exports = mongoose.model('Sale', salesSchema);

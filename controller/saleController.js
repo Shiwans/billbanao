@@ -1,4 +1,6 @@
 const Sale = require('../Model/Sale')
+const Customer = require('../Model/Customer');
+
 
 const fetchData = async(req,res)=>{
         try {
@@ -13,7 +15,7 @@ const postData = async(req,res)=>{
     try{
 
         const {date,
-            customerName, //
+            customerName,
             quantity,
             price,
             paymentStatus,
@@ -31,6 +33,17 @@ const postData = async(req,res)=>{
     })
         
         await newSale.save();
+        const due = amount- paymentDetails.paidAmount;
+        await Customer.findOneAndUpdate(
+            { name: customerName },
+            {
+                $inc: {
+                    totalAmount: amount,
+                    totalJama: paymentDetails.paidAmount,
+                    totalDue: due
+                }
+            }
+        );
         res.status(200).json({message:'Sale saved successfully',sale:newSale})
     }catch(error){
         console.log(error)
@@ -58,30 +71,6 @@ const fetchQuery=async (req,res)=>{
 }
 
 const fetchDay=async (req,res)=>{
-    // try {
-    //     const { date } = req.query;
-    //     if (!date) {
-    //         return res.status(400).json({ message: 'Date query parameter is required' });
-    //     }
-
-    //     // Ensure the date is in YYYY-MM-DD format
-    //     const startDate = new Date(date);
-    //     startDate.setHours(0, 0, 10, 1); // Set start of the day
-
-    //     const endDate = new Date(date);
-    //     endDate.setHours(23, 59, 59, 999); // Set end of the day
-
-    //     const sales = await Sale.find({
-    //         date: {
-    //             $gte: startDate.toISOString().split('T')[0],
-    //             $lte: endDate.toISOString().split('T')[0]
-    //         }
-    //     });
-
-    //     res.status(200).json(sales);
-    // } catch (error) {
-    //     res.status(500).json({ message: 'Error fetching data', error });
-    // }
     try {
         const {start,end} = req.query;
         let query = {}

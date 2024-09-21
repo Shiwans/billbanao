@@ -1,4 +1,4 @@
-.admin-container {
+/*.admin-container {
     display: flex;
   }
   
@@ -124,3 +124,99 @@
   .filter-container{
     width :30%;
   }
+  */
+
+  .reports-container {
+    padding: 20px;
+    background-color: #f4f6f8;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: black;
+  }
+  
+  .date-filters {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  
+  .date-picker-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  
+  .preset-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+  }
+  
+  .preset-buttons button {
+    padding: 8px 12px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .preset-buttons button:hover {
+    background-color: #0056b3;
+  }
+  
+  .table-container {
+    width: 100%;
+    max-width: 1200px;
+    margin-bottom: 20px;
+  }
+  
+  .sales-table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: white;
+  }
+  
+  .sales-table th, .sales-table td {
+    border: 1px solid #ddd;
+    padding: 12px;
+    text-align: center;
+  }
+  
+  .sales-table th {
+    background-color: #007bff;
+    color: white;
+  }
+  
+  .totals {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 20px;
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 8px;
+    width: 100%;
+    max-width: 600px;
+  }
+  
+  .totals div {
+    font-size: 18px;
+    margin: 10px 0;
+  }
+  
+  @media (max-width: 768px) {
+    .date-picker-container, .preset-buttons, .table-container, .totals {
+      flex-direction: column;
+      align-items: center;
+    }
+  
+    .preset-buttons button {
+      margin-bottom: 10px;
+    }
+  }
+  

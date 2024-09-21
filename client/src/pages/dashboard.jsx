@@ -1,21 +1,90 @@
-import Buttons from "../components/buttons"
-const Dashboard =()=>{
+import React, { useEffect, useState } from "react";
+import "./dashboard.css"; // Import custom CSS for styling
 
+const Dashboard = () => {
+  const [data, setData] = useState({
+    salesAmount: 0,
+    salesCount: 0,
+    purchaseAmount: 0,
+    userCount: 0,
+    receivableAmount: 0,
+  });
 
-    return(
-        <div>
-            <ul>
-                <li>navbar at left</li>
-                <li>chart for Sale</li>
-                <li>Expenses</li>
-                <li>you'll receive</li>
-                <li>you'll pay</li>
-                <li></li>
-            </ul>
-            <Buttons />
-            
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch("/api/sales/september", {
+          headers: {
+            // 'Authorization': `Bearer ${localStorage.getItem('token')}`,
+          }
+        });
+
+        if (!response.ok) throw new Error('Failed to fetch data');
+
+        const result = await response.json();
+        setData(result);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
+  return (
+    <div className="dashboard">
+      <div className="row">
+        {/* Sale Section */}
+        <div className="card">
+          <div className="card-content">
+            <h3 className="card-title">Sale</h3>
+            <p className="amount">₹ {data.salesAmount.toLocaleString()}</p>
+            <p className="description">Total Sale (Sep)</p>
+            {/* <p className="growth">0% This Month Growth</p> */}
+          </div>
         </div>
-    )
-}
 
-export default Dashboard
+        <div className="card">
+          <div className="card-content">
+            <h3 className="card-title">Sale's Count</h3>
+            <p className="count">{data.salesCount} Sales</p>
+          </div>
+        </div>
+        
+        <div className="card">
+          <div className="card-content">
+            <h3 className="card-title">You'll Get</h3>
+            <p className="amount">₹ {data.receivableAmount.toLocaleString()}</p>
+            <p className="description">Shiwans Vaishya</p>
+          </div>
+        </div>
+      </div>
+
+      <div className="row">
+        <div className="card">
+          <div className="card-content">
+            <h3 className="card-title">Purchase</h3>
+            <p className="amount">₹ {data.purchaseAmount.toLocaleString()}</p>
+            <p className="description">This Month</p>
+          </div>
+        </div>
+        
+        <div className="card">
+          <div className="card-content">
+            <h3 className="card-title">User Count</h3>
+            <p className="count">{data.userCount} Users</p>
+          </div>
+        </div>
+        
+        <div className="card">
+          <div className="card-content">
+            <h3 className="card-title">You'll Receive</h3>
+            <p className="amount">₹ {data.receivableAmount.toLocaleString()}</p>
+            <p className="description">Shiwans Vaishya</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Dashboard;

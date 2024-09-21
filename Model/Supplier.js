@@ -1,29 +1,45 @@
-const mongoose = require('mongoose')
+const mongoose = require('mongoose');
 
 const supplierSchema = new mongoose.Schema({
-    // businessOwnerId: in case of multiple wholesaler but in this we are assuming only one owner so
-    name:{
-        type:String,
-        required:true
+    // userId: {
+    //     type: mongoose.Schema.Types.ObjectId,
+    //     ref: 'User',
+    //     required: true // Ensure every supplier is associated with a user
+    // },
+    name: {
+        type: String,
+        required: true
     },
-    contactInfo:{
-        phone:Number,
-        email:String,
-        address:String,
+    contactInfo: {
+        phone: {
+            type: Number,
+            required: true,
+        },
+        email: {
+            type: String,
+            required:true,
+        },
+        upi: {
+            type: String,
+            required:true
+        },
     },
-    type:String,
-    totalSupplies:Number,// total value of supplies made by supplier
-    outstandingAmount:Number,//Total amout owe to supplier
-    paymentHistory:[
-        {
-            date:Date,
-            quantity:Number,
-            price:Number,
-            amount:Number
-            // total jama 
-        }
-    ],
-    // Total due amount
-})
+    type: {
+        type: String,
+        default:"supplier"
+    },
+    totalAmount: {
+        type: Number,
+        default: 0, // Total amount of goods purchased
+    },
+    totalPaid: {
+        type: Number,
+        default: 0, // Total amount paid
+    },
+    totalDue: {
+        type: Number,
+        default: 0, // Total left to give
+    },
+});
 
-module.exports = mongoose.model('supplier',supplierSchema)
+module.exports = mongoose.model('Supplier', supplierSchema);
