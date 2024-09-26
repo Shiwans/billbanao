@@ -401,11 +401,11 @@ const Profile = () => {
               currentTransactions.map((transaction) => (
                 <tr key={transaction._id}>
                   <td>{transaction.type}</td>
-                  <td>{new Date(transaction.date).toLocaleDateString()}</td>
+                  <td>{transaction.type === "Sale" ? new Date(transaction.date).toLocaleDateString() : new Date(transaction.paymentDate).toLocaleDateString()}</td>
                   <td>{transaction.type === "Sale" ? transaction.quantity : "-"}</td>
                   <td>{transaction.type === "Sale" ? `₹${transaction.price}` : "-"}</td>
-                  <td>{transaction.type === "Sale" ? `₹${transaction.amount}` : "-"}</td>
-                  <td>{transaction.type === "Payment" ? `₹${transaction.amount}` : "-"}</td>
+                  <td>{transaction.type === "Sale" ? `${transaction.amount.toLocaleString('en-IN',{maximumFractionDigits: 2,style: 'currency',currency: 'INR'})}` : "-"}</td>
+                  <td>{transaction.type === "Payment" ? `${transaction.amount.toLocaleString('en-IN',{maximumFractionDigits: 2,style: 'currency',currency: 'INR'})}` : "-"}</td>
                 </tr>
               ))
             ) : (

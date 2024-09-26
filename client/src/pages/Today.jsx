@@ -28,10 +28,11 @@ const Today = () => {
   const [payment, setPayment] = useState("");
   const [dueAmount, setDueAmount] = useState("");
   const [list, setList] = useState([]);
-  const [customerSales, setCustomerSales] = useState([]);
-  const [supplierSales, setSupplierSales] = useState([]);
-  const [type, setType] = useState("customer");
-  const today = new Date().toISOString().split('T')[0];
+  const [allSales, setAllSales] = useState([]);
+  // const [customerSales, setCustomerSales] = useState([]);
+  // const [supplierSales, setSupplierSales] = useState([]);
+  // const [type, setType] = useState("customer");
+  const today = new Date().toISOString().split("T")[0];
 
   useEffect(() => {
     const fetchCustomersAndSuppliers = async () => {
@@ -54,7 +55,7 @@ const Today = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     // const endpoint = type === "customer" ? "http://localhost:4000/sales/customer" : "http://localhost:4000/sales/supplier";
-    
+
     try {
       const response = await fetch("http://localhost:4000/sales", {
         method: "POST",
@@ -91,7 +92,7 @@ const Today = () => {
           transition: Slide,
         });
 
-        fetchSalesData(); // Fetch updated data after submission
+        // fetchSalesData(); // Fetch updated data after submission
       } else {
         console.error("Error saving sale");
       }
@@ -100,21 +101,76 @@ const Today = () => {
     }
   };
 
-  const fetchSalesData = async () => {
+  useEffect(() => {
+    const fetchSalesData = async () => {
+      try {
+        let query = {
+          start: today,
+          end: today + 1,
+        };
+        const response = await fetch(
+          `http://localhost:4000/sales/day?${query}`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            credentials: "include",
+          }
+        ); // Make sure backend route matches
+        const result = await response.json();
+        setAllSales(result);
+      } catch (error) {
+        console.error("Error fetching sales data", error);
+      }
+    };
+    fetchSalesData();
+  }, []);
+
+  const handleDelete = async (id) => {
     try {
-      // const resp = await fetch(`http://localhost:4000/sales/day?${date}`); // Make sure backend route matches
-
-      
-      // const customerData = await customerResponse.json();
-      // const supplierData = await supplierResponse.json();
-
-      // setCustomerSales(customerData.data);
-      // setSupplierSales(supplierData.data);
+      const response = await fetch(`http://localhost:4000/sales/${id}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+      });
+      if (response.ok) {
+        setAllSales((prevCust) =>
+          prevCust.filter((sales) => sales._id !== id)
+        );
+        toast.success("Sale deleted successfully!", {
+          position: "top-right",
+          autoClose: 1000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "dark",
+          transition: Slide,
+        });
+      } else {
+        toast.error("Error deleting Sale!", {
+          position: "top-right",
+          autoClose: 1000,
+        });
+      }
     } catch (error) {
-      console.error("Error fetching sales data", error);
+      toast.error("unable to delete Sale!", {
+        position: "top-right",
+        autoClose: 1000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "dark",
+        transition: Slide,
+      });
     }
   };
-
 
   return (
     <div className="p-6 bg-white">
@@ -122,17 +178,23 @@ const Today = () => {
         <form onSubmit={handleSubmit}>
           <div className="grid grid-cols-2 gap-4 mb-4 text-black">
             <div>
-              <label className="block text-gray-800 text-sm font-semibold mb-2">Name:</label>
+              <label className="block text-gray-800 text-sm font-semibold mb-2">
+                Name:
+              </label>
               <select
                 onChange={(e) => setName(e.target.value)}
                 value={name}
                 required
                 className="w-full px-3 py-2 border border-gray-400 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
-                <option value="" disabled>Select Customer/Supplier</option>
+                <option value="" disabled>
+                  Select Customer/Supplier
+                </option>
                 {list.length > 0 ? (
                   list.map((item) => (
-                    <option key={item._id} value={item.name}>{item.name}</option>
+                    <option key={item._id} value={item.name}>
+                      {item.name}
+                    </option>
                   ))
                 ) : (
                   <option disabled>No customers/suppliers found</option>
@@ -140,7 +202,9 @@ const Today = () => {
               </select>
             </div>
             <div>
-              <label className="block text-gray-800 text-sm font-semibold mb-2">KG/Jalli:</label>
+              <label className="block text-gray-800 text-sm font-semibold mb-2">
+                KG/Jalli:
+              </label>
               <input
                 type="number"
                 value={kg}
@@ -150,10 +214,12 @@ const Today = () => {
               />
             </div>
           </div>
-  
+
           <div className="grid grid-cols-2 gap-4 mb-4 text-black">
             <div>
-              <label className="block text-gray-800 text-sm font-semibold mb-2">Value:</label>
+              <label className="block text-gray-800 text-sm font-semibold mb-2">
+                Value:
+              </label>
               <input
                 type="number"
                 value={value}
@@ -163,7 +229,9 @@ const Today = () => {
               />
             </div>
             <div>
-              <label className="block text-gray-800 text-sm font-semibold mb-2">Payment Status:</label>
+              <label className="block text-gray-800 text-sm font-semibold mb-2">
+                Payment Status:
+              </label>
               <select
                 value={payment}
                 onChange={(e) => setPayment(e.target.value)}
@@ -176,7 +244,7 @@ const Today = () => {
               </select>
             </div>
           </div>
-  
+
           <div className="mt-4">
             <input
               type="date"
@@ -193,45 +261,60 @@ const Today = () => {
           </div>
         </form>
       </div>
-  
+
       <div className="mt-10 w-full text-black">
         <h3 className="text-lg font-bold mb-4">Page Summary</h3>
         <div className="flex justify-between items-center mb-4">
           <p>Today's Purchases</p>
-          <button className="bg-gray-800 text-white px-4 py-2 rounded-md">Print</button>
+          {/* <button className="bg-gray-800 text-white px-4 py-2 rounded-md">Print</button> */}
         </div>
-  
-        <h4 className="font-bold mt-6">Supplier Purchases</h4>
+
+        <h4 className="font-bold mt-6">All Sales</h4>
         <TableContainer component={Paper}>
           <Table>
             <TableHead>
               <TableRow>
-                <StyledTableCell>Supplier Name</StyledTableCell>
+                <StyledTableCell>Name</StyledTableCell>
                 <StyledTableCell>Qty</StyledTableCell>
                 <StyledTableCell align="right">Price</StyledTableCell>
                 <StyledTableCell align="right">Amount</StyledTableCell>
                 <StyledTableCell align="right">Paid</StyledTableCell>
+                <StyledTableCell align="right">Due</StyledTableCell>
                 <StyledTableCell align="right">Actions</StyledTableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {supplierSales.map((sale) => (
+              {allSales.map((sale) => (
                 <TableRow key={sale._id}>
-                  <TableCell>{sale.supplierName}</TableCell>
+                  <TableCell>{sale.customerName}</TableCell>
                   <TableCell>{sale.quantity}</TableCell>
                   <TableCell align="right">{sale.price}</TableCell>
-                  <TableCell align="right">{sale.quantity * sale.price}</TableCell>
-                  <TableCell align="right">{sale.paymentDetails.paidAmount}</TableCell>
                   <TableCell align="right">
-                    <button className="bg-red-500 text-black px-2 py-1 rounded-md">Delete</button>
+                    {(sale.quantity * sale.price).toLocaleString('en-IN',{maximumFractionDigits: 2,style: 'currency',currency: 'INR'})}
+                  </TableCell>
+                  <TableCell align="right">
+                    {sale.paymentDetails.paidAmount.toLocaleString('en-IN',{maximumFractionDigits: 2,style: 'currency',currency: 'INR'})}
+                  </TableCell>
+                  <TableCell align="right">
+                    {sale.paymentDetails.dueAmount.toLocaleString('en-IN',{maximumFractionDigits: 2,style: 'currency',currency: 'INR'})}
+                  </TableCell>
+                  <TableCell align="right">
+                    <button
+                      className="text-black px-2 py-1 rounded-md border-2 border-rose-500 text-red-700"
+                      onClick={() => {
+                        handleDelete(sale._id);
+                      }}
+                    >
+                      Delete
+                    </button>
                   </TableCell>
                 </TableRow>
               ))}
             </TableBody>
           </Table>
         </TableContainer>
-  
-        <h4 className="font-bold mt-6">Customer Sales</h4>
+
+        {/* <h4 className="font-bold mt-6">Customer Sales</h4>
         <TableContainer component={Paper}>
           <Table>
             <TableHead>
@@ -259,11 +342,10 @@ const Today = () => {
               ))}
             </TableBody>
           </Table>
-        </TableContainer>
+        </TableContainer> */}
       </div>
     </div>
   );
-  
 };
 
 export default Today;

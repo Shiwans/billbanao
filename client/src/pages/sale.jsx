@@ -15,6 +15,10 @@ import {
   Paper 
 } from "@mui/material"; 
 import { makeStyles } from "@mui/styles";
+import { toast, Slide } from "react-toastify";
+import UpdateSale from '../components/UpdateSale'
+import DateQuery from "../components/DateQuery";
+
 
 const useStyles = makeStyles((theme) => ({
   formContainer: {
@@ -61,14 +65,14 @@ const Sale = () => {
   const [date, setDate] = useState("");
   const [quantity, setQuantity] = useState("");
   const [price, setPrice] = useState("");
-  const [paymentStatus, setPaymentStatus] = useState("");
+  const [paymentStatus, setPaymentStatus] = useState("");  //paid,partial,unpaid
   const [paidAmount, setPaidAmount] = useState("");
   const [dueAmount, setDueAmount] = useState("");
   const [totalAmount, setTotalAmount] = useState(0);
-  const [message, setMessage] = useState("");
   const [customerName, setCustomerName] = useState("");
-  const [customerList, setCustomerList] = useState([]);
+  const [customerList, setCustomerList] = useState([]); //for listing dropdown
   const [recentSales, setRecentSales] = useState([]);
+  const [showPopup,setShowPopup] = useState(false)
 
   useEffect(() => {
     const fetchCustomers = async () => {
@@ -89,38 +93,44 @@ const Sale = () => {
     };
     fetchCustomers();
 
-    // Simulate recent sales data (replace with actual backend data)
-    const fetchRecentSales = () => {
-      const randomSales = [...Array(10)].map((_, index) => ({
-        date: "2024-09-20",
-        customerName: `Customer ${index + 1}`,
-        quantity: Math.floor(Math.random() * 10) + 1,
-        price: (Math.random() * 100).toFixed(2),
-        totalAmount: 0,
-        paymentStatus: ["Paid", "Partial", "Unpaid"][Math.floor(Math.random() * 3)],
-        paidAmount: (Math.random() * 50).toFixed(2),
-        dueAmount: (Math.random() * 50).toFixed(2),
-      }));
-      setRecentSales(randomSales);
-    };
+      const fetchSales = async () => {
+        try {
+          const response = await fetch("http://localhost:4000/sales/10", {
+            credentials: "include",
+          });
+          const data = await response.json();
+  
+          // Sort sales data by date (newest first)
+          // const sortedData = data.sort((a, b) => new Date(b.date) - new Date(a.date));
+          setRecentSales(data);
+          // setFilteredData(last10Sales); // Set it to filteredData if you're using filtering elsewhere
+        } catch (error) {
+          console.error("Error fetching sales data:", error);
+        }
+      };
+  
 
-    fetchRecentSales();
-  }, []);
+    fetchSales();
+    
+  }, [showPopup]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const total = quantity * price;
+    const total =parseInt(quantity) * parseInt(price);
+    let updatedPaidAmount = paidAmount;
+    let updatedDueAmount = dueAmount;
 
     // Adjust due and paid amount based on payment status
     if (paymentStatus === "paid") {
-      setPaidAmount(total);
-      setDueAmount(0);
+      updatedPaidAmount = total;
+      updatedDueAmount = 0;
     } else if (paymentStatus === "partial") {
-      setDueAmount(total - paidAmount);
+      updatedPaidAmount = paidAmount;
+      updatedDueAmount = parseInt(total) - parseInt(paidAmount);
     } else if (paymentStatus === "unpaid") {
-      setDueAmount(total);
-      setPaidAmount(0);
+      updatedPaidAmount = 0;
+      updatedDueAmount = total;
     }
 
     const response = await fetch("http://localhost:4000/sales", {
@@ -129,24 +139,44 @@ const Sale = () => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        date,
+        date:new Date(date),
         customerName,
-        quantity: Number(quantity),
-        price: Number(price),
-        totalAmount: total,
+        quantity: parseInt(quantity),
+        price: parseInt(price),
+        totalAmount,
         paymentStatus,
         paymentDetails: {
-          paidAmount: Number(paidAmount),
-          dueAmount: Number(dueAmount),
+          paidAmount: parseInt(updatedPaidAmount),
+          dueAmount: parseInt(updatedDueAmount),
         },
       }),
       credentials: "include",
     });
 
     if (response.ok) {
-      setMessage("Sale data submitted successfully!");
+      toast.success('Sale has been added!', {
+        position: "top-right",
+        autoClose: 1000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "dark",
+        transition: Slide,
+      });
     } else {
-      setMessage("Failed to submit sale data.");
+      toast.error('Error saving Sale!', {
+        position: "top-right",
+        autoClose: 1000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "dark",
+        transition: Slide,
+      });
     }
 
     // Clear form
@@ -157,6 +187,7 @@ const Sale = () => {
     setPaymentStatus("");
     setPaidAmount("");
     setDueAmount("");
+    setTotalAmount("");
   };
 
   const renderPaymentDetails = () => (
@@ -182,15 +213,40 @@ const Sale = () => {
             onChange={(e) => setDueAmount(e.target.value)}
             fullWidth
             required
+            disabled
           />
         </Grid>
       </Grid>
     )
   );
 
+  const handleClick = ()=>{
+    setShowPopup(true)
+  }
+
+  const handleClose = () =>{
+    setShowPopup(false)
+  }
+  const actionBar = <div>
+    <Button variant="contained" color="primary" onClick={handleClose}>Save</Button>
+  </div>
+  let modal = <UpdateSale onClose={handleClose} actionBar={actionBar}>
+    <h1>Update Sale data</h1>
+    <DateQuery />
+
+  </UpdateSale>
+
   return (
     <div className={classes.noScroll}>
+      <div className="flex justify-between mt-2">
       <Typography variant="h4" gutterBottom>Sale</Typography>
+      <Grid item xs={12}>
+        <Button variant="contained" color="primary" type="submit" onClick={handleClick}>
+          Change Sale data 
+        </Button>
+          {showPopup && modal}  
+      </Grid>
+      </div>
       
       {/* Sale Form */}
       <form onSubmit={handleSubmit} className={classes.formContainer}>
@@ -282,9 +338,6 @@ const Sale = () => {
         </Grid>
       </form>
 
-      {/* Message Display */}
-      {message && <Typography color="secondary" style={{ marginTop: "10px" }}>{message}</Typography>}
-
       {/* Recent Sales Table */}
       <Typography variant="h6" style={{ marginTop: "30px" }}>Recent Sales</Typography>
       <TableContainer component={Paper}>
@@ -308,10 +361,12 @@ const Sale = () => {
                 <TableCell>{sale.customerName}</TableCell>
                 <TableCell>{sale.quantity}</TableCell>
                 <TableCell>{sale.price}</TableCell>
-                <TableCell>{(sale.quantity * sale.price).toFixed(2)}</TableCell>
+                <TableCell>{(sale.quantity * sale.price).toFixed(2).toLocaleString('en-IN',{maximumFractionDigits: 2,style: 'currency',currency: 'INR'})}</TableCell>
                 <TableCell>{sale.paymentStatus}</TableCell>
-                <TableCell>{sale.paymentStatus === "paid" ? (sale.quantity * sale.price).toFixed(2) : sale.paidAmount}</TableCell>
-                <TableCell>{sale.paymentStatus === "unpaid" ? (sale.quantity * sale.price).toFixed(2) : sale.dueAmount}</TableCell>
+                <TableCell>{sale.paymentDetails.paidAmount}</TableCell>
+                <TableCell>{sale.paymentDetails.dueAmount}</TableCell>
+                {/* <TableCell>{sale.paymentStatus === "paid" ? (sale.quantity * sale.price).toFixed(2) : sale.paidAmount}</TableCell> */}
+                {/* <TableCell>{sale.paymentStatus === "unpaid" ? (sale.quantity * sale.price).toFixed(2) : sale.dueAmount}</TableCell> */}
               </TableRow>
             ))}
           </TableBody>

@@ -158,10 +158,7 @@ const fetchData = async (req, res) => {
 // Add a new supplier
 const addSupplier = async (req, res) => {
     try {
-        const { name, contactInfo, totalAmount, totalPaid } = req.body;
-
-        // Directly create new supplier without extensive checks
-        const totalDue = totalAmount - totalPaid;
+        const { name, contactInfo, totalAmount, totalPaid,totalDue } = req.body;
 
         const newSupplier = new Supplier({
             name,
@@ -197,7 +194,7 @@ const updateSupplier = async (req, res) => {
                 totalPaid,
                 totalDue,
             },
-            { new: true }
+            { new: true,runValidators: true }
         );
 
         if (!updatedSupplier) {

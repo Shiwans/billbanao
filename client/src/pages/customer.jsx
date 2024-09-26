@@ -7,11 +7,20 @@ const Customer = () => {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
-  const [address, setAddress] = useState("");
-  const [customer, setCustomer] = useState([]);
+  const [upi, setUpi] = useState("");
   const [totalAmount, setTotalAmount] = useState("");
+  const [totalPaid, setTotalPaid] = useState("");
   const [totalDue, setTotalDue] = useState("");
-  
+  const [customer, setCustomer] = useState([]);
+  const [editingCustomerId, setEditingCustomerId] = useState(null);
+
+
+  useEffect(() => {
+    const due = parseInt(totalAmount) - parseInt(totalPaid);
+    setTotalDue(due);
+  }, [totalAmount, totalPaid]);
+
+
   useEffect(() => {
     const fetchCust = async () => {
       try {
@@ -45,23 +54,30 @@ const Customer = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await fetch('http://localhost:4000/customer', {
-        method: 'POST',
+      const method = editingCustomerId ? 'PUT' : 'POST';
+      const url = editingCustomerId ? `http://localhost:4000/customer/${editingCustomerId}` : 'http://localhost:4000/customer';
+      
+      await fetch(url, {
+        method,
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
           name,
           contactInfo: {
-            phone, email, address
-          },totalJama: parseFloat(totalAmount) - parseFloat(totalDue),
-          totalAmount: parseFloat(totalAmount),
-          totalDue: parseFloat(totalDue),
+            phone,
+            email,
+            upi
+          },
+          totalAmount: parseInt(totalAmount),
+          totalPaid: parseInt(totalPaid),
+          totalDue: parseInt(totalDue),
           type: "customer"
         }),
         credentials: "include",
       });
-      toast.success('Customer has been added!', {
+      
+      toast.success(editingCustomerId ? 'Customer has been updated!' : 'Customer has been added!', {
         position: "top-right",
         autoClose: 1000,
         hideProgressBar: false,
@@ -73,12 +89,7 @@ const Customer = () => {
         transition: Slide,
       });
 
-      setName("");
-      setPhone("");
-      setEmail("");
-      setAddress("");
-      setTotalAmount("");
-      setTotalDue("");
+      resetForm();
 
       const response = await fetch('http://localhost:4000/customer');
       const data = await response.json();
@@ -86,7 +97,7 @@ const Customer = () => {
 
     } catch (error) {
       console.error(error);
-      toast.error('Unable to add customer!', {
+      toast.error('Unable to save customer!', {
         position: "top-right",
         autoClose: 1000,
         hideProgressBar: false,
@@ -100,9 +111,75 @@ const Customer = () => {
     }
   };
 
+  const handleEdit = (customer) => {
+    setEditingCustomerId(customer._id);
+    setName(customer.name);
+    setPhone(customer.contactInfo.phone);
+    setEmail(customer.contactInfo.email);
+    setUpi(customer.contactInfo.upi);
+    setTotalAmount(customer.totalAmount);
+    setTotalPaid(customer.totalPaid);
+    setTotalDue(customer.totalDue);
+  };
+
+  const resetForm = () => {
+    setName("");
+    setPhone("");
+    setEmail("");
+    setUpi("");
+    setTotalAmount("");
+    setTotalPaid("");
+    setTotalDue("");
+    setEditingCustomerId(null);
+  };
+
+
+  const handleDelete = async(id) => {
+    try {
+      const response = await fetch(`http://localhost:4000/customer/${id}`,{
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+      });
+      if (response.ok) {
+        setCustomer((prevCust) => prevCust.filter((customer) => customer._id !== id));
+        toast.success("Supplier deleted successfully!", {
+          position: "top-right",
+          autoClose: 1000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "dark",
+          transition: Slide,
+        });
+      } else {
+        toast.error("Error deleting customer!", { position: "top-right", autoClose: 1000 });
+      }
+
+    } catch (error) {
+      toast.error('unable to delete customer!', {
+        position: "top-right",
+        autoClose: 1000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "dark",
+        transition: Slide,
+      });
+    }
+  }
+
   return (
     <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-      <Typography variant="h4" gutterBottom>Customerihog Details</Typography>
+      {/* <Typography variant="h4" gutterBottom>Add Customer</Typography> */}
+      <Typography variant="h4" gutterBottom>{editingCustomerId ? "Edit Customer" : "Add Customer"}</Typography>
+
       
       <Paper elevation={3} sx={{ p: 4, mb: 4 }}>
         <form onSubmit={handleSubmit}>
@@ -148,13 +225,13 @@ const Customer = () => {
             <Grid item xs={12} sm={6}>
               <TextField
                 required
-                id="address"
-                name="address"
+                id="upi"
+                name="upi"
                 label="Upi"
                 fullWidth
                 variant="outlined"
-                value={address}
-                onChange={(e) => setAddress(e.target.value)}
+                value={upi}
+                onChange={(e) => setUpi(e.target.value)}
               />
             </Grid>
             <Grid item xs={12} sm={6}>
@@ -174,17 +251,20 @@ const Customer = () => {
              <Grid item xs={12} sm={6}>
                <TextField
                  variant="outlined"
-                 name="totalDue"
-                 label="Total Due"
+                 name="totalpaid"
+                 label="Total paid"
                  fullWidth
-                 value={totalDue}
-                 onChange={(e) => setTotalDue(e.target.value)}
+                 value={totalPaid}
+                 onChange={(e) => setTotalPaid(e.target.value)}
                  type="number"
                  InputProps={{ inputProps: { min: 0, step: 0.01 } }}
                />
              </Grid>
             <Grid item xs={12}>
-              <Button variant="contained" color="primary" fullWidth type="submit">Submit</Button>
+              {/* <Button variant="contained" color="primary" fullWidth type="submit">Submit</Button> */}
+              <Button type="submit" variant="contained" sx={{ mt: 2 }}>
+            {editingCustomerId ? 'Update Customer' : 'Add Customer'}
+          </Button>
             </Grid>
           </Grid>
         </form>
@@ -197,10 +277,9 @@ const Customer = () => {
               <TableRow>
                 <TableCell>Name</TableCell>
                 <TableCell>Phone</TableCell>
-                <TableCell>Email</TableCell>
-                <TableCell>Address</TableCell>
-                <TableCell>Total Jama</TableCell>
+                <TableCell>Upi</TableCell>
                 <TableCell>Total Amount</TableCell>
+                <TableCell>Total Paid</TableCell>
                 <TableCell>Total Due</TableCell>
                 <TableCell>Action</TableCell>
               </TableRow>
@@ -210,14 +289,13 @@ const Customer = () => {
                 <TableRow key={cstm._id}>
                   <TableCell>{cstm.name}</TableCell>
                   <TableCell>{cstm.contactInfo.phone}</TableCell>
-                  <TableCell>{cstm.contactInfo.email}</TableCell>
-                  <TableCell>{cstm.contactInfo.address}</TableCell>
-                  <TableCell>{cstm.totalJama}</TableCell>
-                  <TableCell>{cstm.totalAmount}</TableCell>
-                  <TableCell>{cstm.totalDue}</TableCell>
+                  <TableCell>{cstm.contactInfo.upi}</TableCell>
+                  <TableCell>{cstm.totalAmount.toLocaleString('en-IN',{maximumFractionDigits: 2,style: 'currency',currency: 'INR'})}</TableCell>
+                  <TableCell>{cstm.totalPaid.toLocaleString('en-IN',{style: 'currency',currency: 'INR'})}</TableCell>
+                  <TableCell>{cstm.totalDue.toLocaleString('en-IN',{maximumFractionDigits: 2,style: 'currency',currency: 'INR'})}</TableCell>
                   <TableCell>
-                    <Button variant="outlined" size="small">Edit</Button>
-                    <Button variant="outlined" size="small" color="error" sx={{ ml: 1 }}>Delete</Button>
+                  <Button variant="outlined" size="small" onClick={() => handleEdit(cstm)}>Edit</Button>
+                    <Button variant="outlined" size="small" color="error" sx={{ ml: 1 }} onClick={()=>{handleDelete(cstm._id)}}>Delete</Button>
                   </TableCell>
                 </TableRow>
               ))}

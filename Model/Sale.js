@@ -7,11 +7,11 @@ const salesSchema = new mongoose.Schema({
     //     ref: 'User',
     //     required: true // Ensure every sale is associated with a user
     // },
-    customerId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Customer',
-        required: true
-    },
+    // customerId: {
+    //     type: mongoose.Schema.Types.ObjectId,
+    //     ref: 'Customer',
+    //     required: true
+    // },
     customerName: {
         type: String,
         required:true
