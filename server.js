@@ -21,7 +21,7 @@ const connectDB = require('./config/db')
 
 
 
-dotenv.config({ path: "./config/config.env" });
+dotenv.config({ path: "./config/.env" });
 
 // require('./config/google')(passport)
 
