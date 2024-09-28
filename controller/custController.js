@@ -4,7 +4,8 @@ const Customer = require('../Model/Customer');
 
 const fetchData = async (req, res) => {
     try {
-        const data = await Customer.find();
+        // const data = await Customer.find({userId:req.user.id});// Fetch customers for the authenticated user
+        const data = await Customer.find()
         res.status(200).json({ message: 'Here are all the customers', data: data });
     } catch (error) {
         console.log(error);
@@ -15,7 +16,7 @@ const fetchData = async (req, res) => {
 const addCustomer = async (req, res) => {
     try {
         const { name, contactInfo, type, totalPaid, totalAmount, totalDue } = req.body;
-        const custCheck = await Customer.findOne({ name });
+        const custCheck = await Customer.findOne({ name,userId:req.user.id });
 
         if (custCheck) {
             return res.status(409).json({ message: 'Customer already exists' }); // Use 409 Conflict
@@ -27,7 +28,8 @@ const addCustomer = async (req, res) => {
             type,
             totalPaid,
             totalAmount,
-            totalDue
+            totalDue,
+            userId:req.user.id
         });
         
         await newCust.save();

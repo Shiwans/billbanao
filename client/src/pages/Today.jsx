@@ -1,14 +1,21 @@
 import React, { useState, useEffect } from "react";
-import Table from "@mui/material/Table";
 import { styled } from "@mui/material/styles";
-import TableBody from "@mui/material/TableBody";
-import TableCell, { tableCellClasses } from "@mui/material/TableCell";
-import TableContainer from "@mui/material/TableContainer";
-import TableHead from "@mui/material/TableHead";
-import TableRow from "@mui/material/TableRow";
-import Paper from "@mui/material/Paper";
 import { toast, Slide } from "react-toastify";
+import {
+  Grid,
+  TextField,
+  Table,
+  TableBody,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  Button,
+  ButtonGroup,
+} from "@mui/material";
+import TableCell, { tableCellClasses } from "@mui/material/TableCell";
 
+// Styled Table Cell
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
     backgroundColor: theme.palette.common.black,
@@ -19,87 +26,64 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
     color: theme.palette.text.primary,
   },
 }));
+// const useStyles = makeStyles((theme) => ({
+// //   formContainer: {
+// //     color: "white",
+// //     padding: "20px",
+// //     borderRadius: "8px",
+// //   },
+// //   textField: {
+// //     "& .MuiInputBase-input": {
+// //       color: "white", //Input
+// //     },
+// //     "& .MuiInputLabel-root": {
+// //       color: "white", // Label
+// //     },
+// //     "& .MuiInputLabel-root.Mui-focused": {
+// //       color: '#91b9ff', // Label color when focused
+// //     },
+// //     "& .MuiOutlinedInput-root": {
+// //       "& fieldset": {
+// //         borderColor: "white",
+// //       },
+// //       "&:hover fieldset": {
+// //         borderColor: "#325fad",
+// //       },
+// //       "&.Mui-focused fieldset": {
+// //         borderColor: "#407fed",
+// //       },
+// //     },
+// //   },
+// //   tableRowHover: {
+// //     "&:hover": {
+// //       backgroundColor: "#f5f5f5",
+// //     },
+// //   },
+// //   noScroll: {
+// //     overflowY: "hidden",
+// //     height: "100vh",
+// //   },
+// // }));
+// Styled Table Row for hover effect
+const StyledTableRow = styled(TableRow)(({ theme }) => ({
+  "&:hover": {
+    backgroundColor: theme.palette.action.hover,
+  },
+}));
 
 const Today = () => {
   const [name, setName] = useState("");
-  const [kg, setKg] = useState("");
+  const [quantity, setQuantity] = useState("");
   const [value, setValue] = useState("");
-  const [jama, setJama] = useState("");
   const [payment, setPayment] = useState("");
+  const [paidAmount, setPaidAmount] = useState("");
   const [dueAmount, setDueAmount] = useState("");
-  const [list, setList] = useState([]);
-  const [allSales, setAllSales] = useState([]);
-  // const [customerSales, setCustomerSales] = useState([]);
-  // const [supplierSales, setSupplierSales] = useState([]);
-  // const [type, setType] = useState("customer");
+  // const [list, setList] = useState([]);
+  const [customers, setCustomer] = useState([]);
+  const [suppliers, setSupplier] = useState([]);
+  const [allSales, setAllSales] = useState([]); // Initialize as an empty array
+  const [activeTab, setActiveTab] = useState("customer");
   const today = new Date().toISOString().split("T")[0];
-
-  useEffect(() => {
-    const fetchCustomersAndSuppliers = async () => {
-      try {
-        const customerResponse = await fetch("http://localhost:4000/customer"); // Adjust as per backend
-        const supplierResponse = await fetch("http://localhost:4000/supplier");
-
-        const customerResult = await customerResponse.json();
-        const supplierResult = await supplierResponse.json();
-
-        setList([...customerResult.data, ...supplierResult.data]);
-      } catch (error) {
-        console.error("Error fetching data", error);
-        setList([]);
-      }
-    };
-    fetchCustomersAndSuppliers();
-  }, []);
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    // const endpoint = type === "customer" ? "http://localhost:4000/sales/customer" : "http://localhost:4000/sales/supplier";
-
-    try {
-      const response = await fetch("http://localhost:4000/sales", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          date: today, // Make sure you're sending the date as the backend expects
-          customerName: name,
-          quantity: Number(kg),
-          price: Number(value),
-          paymentStatus: payment,
-          paymentDetails: {
-            paidAmount: Number(jama),
-            dueAmount: Number(dueAmount),
-          },
-        }),
-      });
-
-      if (response.ok) {
-        setName("");
-        setKg("");
-        setValue("");
-        setJama("");
-        setPayment("");
-        setDueAmount("");
-
-        toast.success("Sale has been saved!", {
-          position: "top-right",
-          autoClose: 1000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          theme: "light",
-          transition: Slide,
-        });
-
-        // fetchSalesData(); // Fetch updated data after submission
-      } else {
-        console.error("Error saving sale");
-      }
-    } catch (error) {
-      console.error("Error saving sale", error);
-    }
-  };
 
   useEffect(() => {
     const fetchSalesData = async () => {
@@ -122,10 +106,154 @@ const Today = () => {
         setAllSales(result);
       } catch (error) {
         console.error("Error fetching sales data", error);
+        setAllSales([]);
       }
     };
     fetchSalesData();
   }, []);
+
+  useEffect(() => {
+    const fetchCustomersAndSuppliers = async () => {
+      try {
+        const customerResponse = await fetch("http://localhost:4000/customer");
+        const supplierResponse = await fetch("http://localhost:4000/supplier");
+
+        const customerResult = await customerResponse.json();
+        const supplierResult = await supplierResponse.json();
+
+        setCustomer(customerResult);
+        setSupplier(supplierResult);
+        // setList([...customerResult.data, ...supplierResult.data]);
+      } catch (error) {
+        console.error("Error fetching data", error);
+        setCustomer([]);
+        setSupplier([]);
+        // setAllSales([]); // Ensure this is set to an empty array on error
+      }
+    };
+    fetchCustomersAndSuppliers();
+  }, []);
+
+  const handleTabSwitch = (tab) => {
+    setActiveTab(tab);
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const total = parseInt(quantity) * parseInt(value);
+
+    let updatedPaidAmount = paidAmount;
+    let updatedDueAmount = dueAmount;
+
+    if (payment === "paid") {
+      updatedPaidAmount = total;
+      updatedDueAmount = 0;
+    } else if (payment === "partial") {
+      updatedPaidAmount = paidAmount;
+      updatedDueAmount = total - paidAmount;
+    } else if (payment === "unpaid") {
+      updatedPaidAmount = 0;
+      updatedDueAmount = total;
+    }
+
+    try {
+      const response = await fetch("http://localhost:4000/sales", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          date: today,
+          name,
+          quantity: Number(quantity),
+          price: Number(value),
+          paymentStatus: payment,
+          paymentDetails: {
+            paidAmount: Number(updatedPaidAmount),
+            dueAmount: Number(updatedDueAmount),
+          },
+        }),
+      });
+
+      if (response.ok) {
+        setName("");
+        setQuantity("");
+        setValue("");
+        setPaidAmount("");
+        setPayment("");
+        setDueAmount("");
+        toast.success("Transaction has been saved!", {
+          position: "top-right",
+          autoClose: 1000,
+          transition: Slide,
+        });
+        // Re-fetch sales to include the new entry
+        // const salesResponse = await fetch("http://localhost:4000/sales");
+        // const salesResult = await salesResponse.json();
+        // setAllSales(salesResult.data);
+      } else {
+        console.error("Error saving transaction");
+      }
+    } catch (error) {
+      console.error("Error saving transaction", error);
+    }
+  };
+
+  // Calculate totals for page summary
+  // Calculate totals for page summary
+  console.log("allSales:", allSales); // Check the value of allSales
+  const totalSales = Array.isArray(allSales)
+    ? allSales.reduce((acc, sale) => acc +sale.amount, 0)
+    : 0;
+  const totalPaid = Array.isArray(allSales)
+    ? allSales.reduce((acc, sale) => acc + sale.paymentDetails.paidAmount, 0)
+    : 0;
+  const totalDue = Array.isArray(allSales)
+    ? allSales.reduce((acc, sale) => acc + sale.paymentDetails.dueAmount, 0)
+    : 0;
+
+  // const filteredSales = allSales.filter((sale) =>
+  //   activeTab === "customer"
+  //     ? sale.name.includes("Customer")
+  //     : sale.name.includes("Supplier")
+  // );
+  const filteredSales = allSales.filter((sale) =>
+    activeTab === "customer"
+      ? sale.type && sale.type.includes("customer")  // Check if sale.type is defined
+      : sale.type && sale.type.includes("supplier")  // Check if sale.type is defined
+  );
+
+  const renderPaymentDetails = () =>
+    payment === "partial" && (
+      <div>
+        <label className="block text-gray-800 text-sm font-semibold mb-2">
+          Partial Payment
+        </label>
+        <Grid container spacing={2}>
+          <Grid item xs={6}>
+            <TextField
+              label="Paid Amount"
+              type="number"
+              // className={classes.textField}
+              value={paidAmount}
+              onChange={(e) => setPaidAmount(e.target.value)}
+              fullWidth
+              required
+            />
+          </Grid>
+          <Grid item xs={6}>
+            <TextField
+              label="Due Amount"
+              // className={classes.textField}
+              type="number"
+              value={dueAmount}
+              onChange={(e) => setDueAmount(e.target.value)}
+              fullWidth
+              required
+              disabled
+            />
+          </Grid>
+        </Grid>
+      </div>
+    );
 
   const handleDelete = async (id) => {
     try {
@@ -137,9 +265,7 @@ const Today = () => {
         credentials: "include",
       });
       if (response.ok) {
-        setAllSales((prevCust) =>
-          prevCust.filter((sales) => sales._id !== id)
-        );
+        setAllSales((prevCust) => prevCust.filter((sales) => sales._id !== id));
         toast.success("Sale deleted successfully!", {
           position: "top-right",
           autoClose: 1000,
@@ -174,7 +300,22 @@ const Today = () => {
 
   return (
     <div className="p-6 bg-white">
-      <div className="w-full md:w-1/2 mx-auto shadow-lg rounded-lg p-6 mt-4 border border-gray-300">
+      <ButtonGroup fullWidth>
+        <Button
+          onClick={() => handleTabSwitch("customer")}
+          variant={activeTab === "customer" ? "contained" : "outlined"}
+        >
+          Customer
+        </Button>
+        <Button
+          onClick={() => handleTabSwitch("supplier")}
+          variant={activeTab === "supplier" ? "contained" : "outlined"}
+        >
+          Supplier
+        </Button>
+      </ButtonGroup>
+
+      <div className="w-full md:w-1/2 mx-auto shadow-lg rounded-lg p-6 mt-4 border border-gray-300 bg-gray-100">
         <form onSubmit={handleSubmit}>
           <div className="grid grid-cols-2 gap-4 mb-4 text-black">
             <div>
@@ -188,29 +329,39 @@ const Today = () => {
                 className="w-full px-3 py-2 border border-gray-400 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="" disabled>
-                  Select Customer/Supplier
+                  Select {activeTab === "customer" ? "Customer" : "Supplier"}
                 </option>
-                {list.length > 0 ? (
-                  list.map((item) => (
-                    <option key={item._id} value={item.name}>
-                      {item.name}
+                {activeTab === "customer" ? (
+                  customers.length > 0 ? (
+                    customers.map((item) => (
+                      <option key={item._id} value={item.name}>
+                        {item.name}
+                      </option>
+                    ))
+                  ) : (
+                    <option disabled>No customers found</option>
+                  )
+                ) : suppliers.length > 0 ? (
+                  suppliers.map((iten) => (
+                    <option key={iten._id} value={iten.name}>
+                      {iten.name}
                     </option>
                   ))
                 ) : (
-                  <option disabled>No customers/suppliers found</option>
+                  <option disabled>No suppliers found</option>
                 )}
               </select>
             </div>
             <div>
               <label className="block text-gray-800 text-sm font-semibold mb-2">
-                KG/Jalli:
+                Quantity
               </label>
               <input
-                type="number"
-                value={kg}
-                onChange={(e) => setKg(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-400 rounded-md"
-                placeholder="Enter weight in kg"
+                value={quantity}
+                onChange={(e) => setQuantity(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-400 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Enter quantity"
+                variant="outlined"
               />
             </div>
           </div>
@@ -218,40 +369,47 @@ const Today = () => {
           <div className="grid grid-cols-2 gap-4 mb-4 text-black">
             <div>
               <label className="block text-gray-800 text-sm font-semibold mb-2">
-                Value:
+                Value
               </label>
               <input
                 type="number"
                 value={value}
                 onChange={(e) => setValue(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-400 rounded-md"
-                placeholder="Enter value per kg"
+                className="w-full px-3 py-2 border border-gray-400 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                variant="outlined"
+                placeholder="Enter value"
               />
             </div>
             <div>
               <label className="block text-gray-800 text-sm font-semibold mb-2">
-                Payment Status:
+                Payment Status
               </label>
               <select
                 value={payment}
                 onChange={(e) => setPayment(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-400 rounded-md"
+                className="w-full px-3 py-2 border border-gray-400 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="">Select Payment Status</option>
                 <option value="paid">Paid</option>
                 <option value="partial">Partial</option>
-                <option value="due">Due</option>
+                <option value="unpaid">Unpaid</option>
               </select>
             </div>
           </div>
 
+          <div className="grid grid-cols-2 gap-4 mb-4 text-black">
+            {renderPaymentDetails()}
+
+            <div className="mt-4">
+              <input
+                type="date"
+                value={today}
+                disabled
+                className="w-full px-3 py-2 border border-gray-400 rounded-md mb-4 text-gray-500"
+              />
+            </div>
+          </div>
           <div className="mt-4">
-            <input
-              type="date"
-              value={today}
-              disabled
-              className="w-full px-3 py-2 border border-gray-400 rounded-md mb-4 text-gray-500"
-            />
             <button
               type="submit"
               className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-800 transition-colors"
@@ -262,42 +420,85 @@ const Today = () => {
         </form>
       </div>
 
-      <div className="mt-10 w-full text-black">
-        <h3 className="text-lg font-bold mb-4">Page Summary</h3>
-        <div className="flex justify-between items-center mb-4">
-          <p>Today's Purchases</p>
-          {/* <button className="bg-gray-800 text-white px-4 py-2 rounded-md">Print</button> */}
+      <div className="mt-8 w-full text-black bg-gray-100 p-4 rounded-lg shadow-md">
+        <h1 className="text-lg font-bold mb-2">Page Summary</h1>
+        <div className="flex flex-wrap gap-4	mb-4 text-center items-center">
+          <div className="info-item">
+            <strong>Total Sales:</strong>{" "}
+            {totalDue.toLocaleString("en-IN", {
+              style: "currency",
+              currency: "INR",
+            })}
+          </div>
+          <div className="info-item">
+            <strong>Total amount:</strong>{" "}
+            {totalDue.toLocaleString("en-IN", {
+              style: "currency",
+              currency: "INR",
+            })}
+          </div>
+          <div className="info-item">
+            <strong className="info">Total paid:</strong>{" "}
+            {totalDue.toLocaleString("en-IN", {
+              style: "currency",
+              currency: "INR",
+            })}
+          </div>
+          <div className="info-item">
+            <strong>Profit:</strong>{" "}
+            {totalDue.toLocaleString("en-IN", {
+              style: "currency",
+              currency: "INR",
+            })}
+          </div>
         </div>
+      </div>
 
-        <h4 className="font-bold mt-6">All Sales</h4>
+      {/* //table from here/ */}
+      <div className="mt-10 w-full text-black">
+        <h3 className="text-lg font-bold mb-2">
+          {activeTab === "customer"
+            ? "Todays Customer Sales"
+            : "Todays Supplier Sales"}
+        </h3>
         <TableContainer component={Paper}>
           <Table>
             <TableHead>
               <TableRow>
                 <StyledTableCell>Name</StyledTableCell>
-                <StyledTableCell>Qty</StyledTableCell>
-                <StyledTableCell align="right">Price</StyledTableCell>
-                <StyledTableCell align="right">Amount</StyledTableCell>
-                <StyledTableCell align="right">Paid</StyledTableCell>
-                <StyledTableCell align="right">Due</StyledTableCell>
-                <StyledTableCell align="right">Actions</StyledTableCell>
+                <StyledTableCell>Quantity</StyledTableCell>
+                <StyledTableCell>Value</StyledTableCell>
+                <StyledTableCell>Amount</StyledTableCell>
+                <StyledTableCell>Paid</StyledTableCell>
+                <StyledTableCell>Due</StyledTableCell>
+                <StyledTableCell>Actions</StyledTableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {allSales.map((sale) => (
-                <TableRow key={sale._id}>
-                  <TableCell>{sale.customerName}</TableCell>
-                  <TableCell>{sale.quantity}</TableCell>
-                  <TableCell align="right">{sale.price}</TableCell>
-                  <TableCell align="right">
-                    {(sale.quantity * sale.price).toLocaleString('en-IN',{maximumFractionDigits: 2,style: 'currency',currency: 'INR'})}
-                  </TableCell>
-                  <TableCell align="right">
-                    {sale.paymentDetails.paidAmount.toLocaleString('en-IN',{maximumFractionDigits: 2,style: 'currency',currency: 'INR'})}
-                  </TableCell>
-                  <TableCell align="right">
-                    {sale.paymentDetails.dueAmount.toLocaleString('en-IN',{maximumFractionDigits: 2,style: 'currency',currency: 'INR'})}
-                  </TableCell>
+              {filteredSales.map((sale) => (
+                <StyledTableRow key={sale._id}>
+                  <StyledTableCell>{sale.customerName}</StyledTableCell>
+                  <StyledTableCell>{sale.quantity}</StyledTableCell>
+                  <StyledTableCell align="right">{sale.value}</StyledTableCell>
+                  <StyledTableCell>
+                    {(sale.quantity * sale.price).toLocaleString("en-IN", {
+                      style: "currency",
+                      currency: "INR",
+                    })}
+                  </StyledTableCell>
+                  <StyledTableCell>
+                    {sale.paymentDetails.paidAmount.toLocaleString("en-IN", {
+                      style: "currency",
+                      currency: "INR",
+                    })}
+                  </StyledTableCell>
+                  <StyledTableCell>
+                    {sale.paymentDetails.dueAmount.toLocaleString("en-IN", {
+                      style: "currency",
+                      currency: "INR",
+                    })}
+                  </StyledTableCell>
+                  {/* <StyledTableCell>{sale.date}</StyledTableCell> */}
                   <TableCell align="right">
                     <button
                       className="text-black px-2 py-1 rounded-md border-2 border-rose-500 text-red-700"
@@ -308,41 +509,11 @@ const Today = () => {
                       Delete
                     </button>
                   </TableCell>
-                </TableRow>
+                </StyledTableRow>
               ))}
             </TableBody>
           </Table>
         </TableContainer>
-
-        {/* <h4 className="font-bold mt-6">Customer Sales</h4>
-        <TableContainer component={Paper}>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <StyledTableCell>Customer Name</StyledTableCell>
-                <StyledTableCell>Qty</StyledTableCell>
-                <StyledTableCell align="right">Price</StyledTableCell>
-                <StyledTableCell align="right">Amount</StyledTableCell>
-                <StyledTableCell align="right">Paid</StyledTableCell>
-                <StyledTableCell align="right">Actions</StyledTableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {customerSales.map((sale) => (
-                <TableRow key={sale._id}>
-                  <TableCell>{sale.customerName}</TableCell>
-                  <TableCell>{sale.quantity}</TableCell>
-                  <TableCell align="right">{sale.price}</TableCell>
-                  <TableCell align="right">{sale.quantity * sale.price}</TableCell>
-                  <TableCell align="right">{sale.paymentDetails.paidAmount}</TableCell>
-                  <TableCell align="right">
-                    <button className="bg-red-500 text-black px-2 py-1 rounded-md">Delete</button>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer> */}
       </div>
     </div>
   );

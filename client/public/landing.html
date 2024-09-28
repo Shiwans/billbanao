@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -45,6 +45,9 @@
         .login-button:hover {
             background-color: #357ae8;
         }
+        .login-button:focus {
+            outline: 2px solid #357ae8; /* Outline for keyboard navigation */
+        }
     </style>
 </head>
 <body>
@@ -54,23 +57,49 @@
         <button class="login-button" onclick="window.location.href='/auth/google'">Login with Google</button>
     </div>
     <script>
+        // Function to set a cookie
+        function setCookie(name, value, days) {
+            const d = new Date();
+            d.setTime(d.getTime() + (days*24*60*60*1000));
+            const expires = "expires=" + d.toUTCString();
+            document.cookie = name + "=" + value + ";" + expires + ";path=/";
+        }
+
+        // Function to get a cookie by name
+        function getCookie(name) {
+            const nameEQ = name + "=";
+            const ca = document.cookie.split(';');
+            for(let i = 0; i < ca.length; i++) {
+                let c = ca[i];
+                while (c.charAt(0) === ' ') c = c.substring(1,c.length);
+                if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length,c.length);
+            }
+            return null;
+        }
+
         window.onload = function() {
-            const token = localStorage.getItem('token');
+            const token = getCookie('token');
+            const redirectUrl = 'http://localhost:3000/supplier'; // Dashboard route
+
+            console.log('Existing token (from cookie):', token); // Check for existing token
+
             if (token) {
                 // Token exists, redirect to the dashboard
-                window.location.href = 'http://localhost:3000/supplier'; // Update with your dashboard route
+                window.location.href = redirectUrl;
             } else {
                 // Check URL for a new token
                 const urlParams = new URLSearchParams(window.location.search);
                 const newToken = urlParams.get('token');
+                console.log('Retrieved token from URL:', newToken); // Log the token
+
                 if (newToken) {
-                    localStorage.setItem('token', newToken); // Store the JWT
+                    setCookie('token', newToken, 7); // Store the JWT in a cookie (7 days expiry)
+                    console.log('Token stored in cookie:', newToken); // Log the stored token
                     // Redirect to the dashboard after storing the token
-                    window.location.href = 'http://localhost:3000/supplier'; // Update with your dashboard route
+                    window.location.href = redirectUrl;
                 }
             }
         };
     </script>
-    
 </body>
-</html>
+</html> -->

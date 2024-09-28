@@ -12,9 +12,10 @@ body {
 
 
 
-.content {
-  margin-left: 170px; 
+.maincontent {
+  margin-left: 200px; 
+  padding:10px;
   width: calc(
-    100% - 170px
+    100% - 200px
   );  
 }

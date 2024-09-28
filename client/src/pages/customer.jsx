@@ -54,8 +54,8 @@ const Customer = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const method = editingCustomerId ? 'PUT' : 'POST';
       const url = editingCustomerId ? `http://localhost:4000/customer/${editingCustomerId}` : 'http://localhost:4000/customer';
+      const method = editingCustomerId ? 'PUT' : 'POST';
       
       await fetch(url, {
         method,
@@ -90,8 +90,7 @@ const Customer = () => {
       });
 
       resetForm();
-
-      const response = await fetch('http://localhost:4000/customer');
+      const response = await fetch('http://localhost:4000/customer',{method:"GET"});
       const data = await response.json();
       setCustomer(data.data);
 

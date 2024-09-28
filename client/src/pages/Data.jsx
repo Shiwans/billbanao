@@ -7,6 +7,9 @@ import { toast, Slide } from "react-toastify";
 // import { MdDelete } from "react-icons/md";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import {jsPDF} from 'jspdf'
+import 'jspdf-autotable'
+
 
 const Reports = () => {
   const [startDate, setStartDate] = useState("");
@@ -17,6 +20,17 @@ const Reports = () => {
   const [salesData, setSalesData] = useState([]);
   const [customerList, setCustomerList] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
+
+  const doc = new jsPDF();
+
+  const handleClick=async()=>{
+    const doc = new jsPDF()
+    doc.autoTable({
+      html:'#my-table'
+    })
+
+    doc.save("data.pdf")
+  }
 
   useEffect(() => {
     const fetchCustomers = async () => {
@@ -214,8 +228,11 @@ const Reports = () => {
         </div>
 
         <div className="table-container">
-          <h2>Sales Report</h2>
-          <table className="sales-table">
+          <div className="flex justify-between mb-1">
+          <h2 className="font-medium text-lg">Sales Report</h2>
+          <button className="pdf-button	" onClick={handleClick}>Export</button>
+          </div>
+          <table className="sales-table" id="my-table">
             <thead>
               <tr>
                 <th>Date</th>

@@ -2,23 +2,21 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema; 
 
 const salesSchema = new mongoose.Schema({
-    // userId: {
-    //     type: mongoose.Schema.Types.ObjectId,
-    //     ref: 'User',
-    //     required: true // Ensure every sale is associated with a user
-    // },
-    // customerId: {
-    //     type: mongoose.Schema.Types.ObjectId,
-    //     ref: 'Customer',
-    //     required: true
-    // },
+    customerId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Customer',
+    },
+    supplierId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Supplier',
+    },
     customerName: {
         type: String,
-        required:true
+        required: true
     },
     date: {
-        type: String, // Format it to YYYY-MM-DD
-        required:true
+        type: Date, // Changed to Date type
+        required: true
     },
     quantity: {
         type: Number,
@@ -30,7 +28,7 @@ const salesSchema = new mongoose.Schema({
     },
     amount: {
         type: Number,
-        required:true
+        required: true
     },
     paymentStatus: {
         type: String,
@@ -46,19 +44,25 @@ const salesSchema = new mongoose.Schema({
     },
     type: {
         type: String,
+        enum: ['customer', 'supplier'],
+        required: true // Ensure type is always set
+    }
+}, { timestamps: true });
 
-    },
-    createdAt: {
-        type: Date,
-        default: Date.now,
-    },
-});
+// Pre-save hook to determine type and format date
+salesSchema.pre('save', function (next) {
+    // Set type based on IDs
+    if (this.customerId) {
+        this.type = 'customer';
+    } else if (this.supplierId) {
+        this.type = 'supplier';
+    } else {
+        return next(new Error('Either customerId or supplierId must be provided.'));
+    }
 
-// Pre-save to format date
-salesSchema.pre('save', function(next) {
+    // Format date if it's provided
     if (this.date) {
-        const formattedDate = new Date(this.date).toISOString().split('T')[0];
-        this.date = formattedDate;
+        this.date = new Date(this.date); // Mongoose will handle formatting
     }
     next();
 });
