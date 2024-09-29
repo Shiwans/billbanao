@@ -3,7 +3,7 @@ const Customer = require('../Model/Customer');
 
 const fetchData = async(req,res)=>{
         try {
-            const data =await Sale.find()
+            const data =await Sale.find({userId: req.user.id})
             // console.log('data from sale routes for fetching',data)
         } catch (error) {
             res.status(500).json({message:"Error while fetching data ",error})
@@ -13,7 +13,7 @@ const fetchData = async(req,res)=>{
 const postData = async(req,res)=>{
     try{
         const {date,
-            customerName,
+            name,
             quantity,
             price,
             paymentStatus,
@@ -21,19 +21,20 @@ const postData = async(req,res)=>{
         const amount = quantity * price;
         const newSale = new Sale({
             date,
-            customerName,
+            name,
             quantity,
             price,
             amount,
             paymentStatus,
             paymentDetails,
-            type
+            type,
+            userId: req.user.id
     })
         
         await newSale.save();
         const due = parseInt(amount) - parseInt(paymentDetails.paidAmount);
         await Customer.findOneAndUpdate(
-            { name: customerName },
+            { name: name, userId: req.user.id },
             {
                 $inc: {
                     totalAmount: amount,
@@ -50,15 +51,14 @@ const postData = async(req,res)=>{
 }
 
 const updateSale = async (req, res) => {
-    const { id } = req.params; // Get sale ID from URL parameters
-    const updatedData = req.body; // Get updated data from request body
+    const { id } = req.params; 
+    const updatedData = req.body;
   
     try {
       // Find the sale by ID and update it with new data
-      const sale = await Sale.findByIdAndUpdate(id, updatedData, {
-        new: true, // Return the updated document
-        runValidators: true, // Ensure the data follows schema validation rules
-      });
+      const sale = await Sale.findByIdAndUpdate({ _id: id, userId: req.user.id}, updatedData,
+        { new: true, runValidators: true }
+      );
   
       if (!sale) {
         return res.status(404).json({ message: 'Sale not found' });
@@ -78,11 +78,11 @@ const updateSale = async (req, res) => {
 const fetchQuery=async (req,res)=>{
     try {
         const {startDate,endDate} = req.query;
-        let query = {}
+        let query = { userId: req.user.id };
         if(startDate && endDate){
             query.date={
-                $gte:startDate,
-                $lte:endDate
+                $gte: new Date(startDate),
+                $lte: new Date(endDate)
             }
         
         }
@@ -97,7 +97,7 @@ const fetchQuery=async (req,res)=>{
 const fetchDay = async (req, res) => {
     try {
       const { start, end } = req.query;
-      let query = {};
+      let query = { userId: req.user.id };
   
       if (start && end) {
         query.date = {
@@ -124,17 +124,10 @@ const fetchDay = async (req, res) => {
             return res.status(400).json({ message: 'Customer name and date query parameters are required' });
         }
 
-        // const targetDate = new Date(date);
-        // const startDate = new Date(targetDate.setHours(0, 0, 0, 0));
-        // const endDate = new Date(targetDate.setHours(23, 59, 59, 999));
-
         const sales = await Sale.find({
-            customerName: name,
+            name: name,
             date: date,
-            // date: {
-                // $gte: targetDate,
-                // $lt: endDate
-            // }
+            userId: req.user.id
         });
 
         if (sales.length === 0) {
@@ -152,7 +145,7 @@ const fetchCustomer = async (req, res) => {
     try {
         const { name } = req.query;
         if (name) {
-            const sales = await Sale.find({ customerName: name });
+            const sales = await Sale.find({ name, userId: req.user.id });
             res.status(200).json({ message: 'Sales for customer fetched successfully', data: sales });
         } else {
             res.status(400).json({ message: 'Customer name query parameter is required' });
@@ -165,7 +158,7 @@ const fetchCustomer = async (req, res) => {
 
 const deleteSale = async (req, res) => {
     try {
-        const customer = await Sale.findById(req.params.id);
+        const customer = await Sale.findById({ _id: req.params.id, userId: req.user.id });
 
         if (!customer) {
             return res.status(404).json({ message: 'Customer not found' });
@@ -181,7 +174,7 @@ const deleteSale = async (req, res) => {
 
 const fetch10Sale = async (req,res) =>{
     try {
-      const sales = await Sale.find().sort({ createdAt: -1 }).limit(10);
+      const sales = await Sale.find({ userId: req.user.id }).sort({ createdAt: -1 }).limit(10)
       res.json(sales);
     } catch (error) {
       res.status(500).json({ message: "Error fetching sales" });

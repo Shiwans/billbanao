@@ -69,10 +69,12 @@ const Sale = () => {
   const [paidAmount, setPaidAmount] = useState("");
   const [dueAmount, setDueAmount] = useState("");
   const [totalAmount, setTotalAmount] = useState(0);
-  const [customerName, setCustomerName] = useState("");
+  const [name, setName] = useState("");
   const [customerList, setCustomerList] = useState([]); //for listing dropdown
   const [recentSales, setRecentSales] = useState([]);
   const [showPopup,setShowPopup] = useState(false)
+
+  const token = localStorage.getItem("token");
 
   useEffect(() => {
     const fetchCustomers = async () => {
@@ -81,6 +83,8 @@ const Sale = () => {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+
           },
           credentials: "include",
         });
@@ -96,6 +100,11 @@ const Sale = () => {
       const fetchSales = async () => {
         try {
           const response = await fetch("http://localhost:4000/sales/10", {
+            method:"GET",
+            headers:{
+              "Content-Type":"application/json",
+              Authorization: `Bearer ${token}`,
+            },
             credentials: "include",
           });
           const data = await response.json();
@@ -137,10 +146,12 @@ const Sale = () => {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+
       },
       body: JSON.stringify({
         date:new Date(date),
-        customerName,
+        name,
         quantity: parseInt(quantity),
         price: parseInt(price),
         totalAmount,
@@ -181,7 +192,7 @@ const Sale = () => {
 
     // Clear form
     setDate("");
-    setCustomerName("");
+    setName("");
     setQuantity("");
     setPrice("");
     setPaymentStatus("");
@@ -269,8 +280,8 @@ const Sale = () => {
               select
               className={classes.textField}
               label="Customer Name"
-              value={customerName}
-              onChange={(e) => setCustomerName(e.target.value)}
+              value={name}
+              onChange={(e) => setName(e.target.value)}
               fullWidth
               required
             >
@@ -358,7 +369,7 @@ const Sale = () => {
             {recentSales.map((sale, index) => (
               <TableRow key={index} className={classes.tableRowHover}>
                 <TableCell>{sale.date}</TableCell>
-                <TableCell>{sale.customerName}</TableCell>
+                <TableCell>{sale.name}</TableCell>
                 <TableCell>{sale.quantity}</TableCell>
                 <TableCell>{sale.price}</TableCell>
                 <TableCell>{(sale.quantity * sale.price).toFixed(2).toLocaleString('en-IN',{maximumFractionDigits: 2,style: 'currency',currency: 'INR'})}</TableCell>

@@ -7,9 +7,8 @@ import { toast, Slide } from "react-toastify";
 // import { MdDelete } from "react-icons/md";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import {jsPDF} from 'jspdf'
-import 'jspdf-autotable'
-
+import { jsPDF } from "jspdf";
+import "jspdf-autotable";
 
 const Reports = () => {
   const [startDate, setStartDate] = useState("");
@@ -18,19 +17,22 @@ const Reports = () => {
   const [totalAmount, setTotalAmount] = useState(0);
   const [totalJama, setTotalJama] = useState(0);
   const [salesData, setSalesData] = useState([]);
+  const [averagePrice, setAveragePrice] = useState([]);
+  const [totalDue, setTotalDue] = useState([]);
+  const [profitOrLoss, setProfitOrLoss] = useState([]);
   const [customerList, setCustomerList] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
-
+  const token = localStorage.getItem("token");
   const doc = new jsPDF();
 
-  const handleClick=async()=>{
-    const doc = new jsPDF()
+  const handleClick = async () => {
+    const doc = new jsPDF();
     doc.autoTable({
-      html:'#my-table'
-    })
+      html: "#my-table",
+    });
 
-    doc.save("data.pdf")
-  }
+    doc.save("data.pdf");
+  };
 
   useEffect(() => {
     const fetchCustomers = async () => {
@@ -39,6 +41,7 @@ const Reports = () => {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
           },
           credentials: "include",
         });
@@ -72,6 +75,7 @@ const Reports = () => {
               method: "GET",
               headers: {
                 "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
               },
               credentials: "include",
             }
@@ -122,8 +126,24 @@ const Reports = () => {
       (acc, item) => acc + (item.paymentDetails?.paidAmount || 0),
       0
     );
+    const totalQuantity = filteredData.reduce(
+      (acc, item) => acc + (item.quantity || 0),
+      0
+    );
+    const totalPurchase = filteredData.reduce(
+      (acc, item) => acc + (item.purchaseAmount || 0), // Assuming purchaseAmount exists
+      0
+    );
+  
+    const averagePrice = totalQuantity > 0 ? totalSold / totalQuantity : 0;
+    const totalDue = totalSold - totalPaid;
+    const profitOrLoss = totalSold - totalPurchase;
+  
     setTotalAmount(totalSold);
     setTotalJama(totalPaid);
+    setAveragePrice(averagePrice);
+    setTotalDue(totalDue);
+    setProfitOrLoss(profitOrLoss);
   }, [filteredData]);
 
   // Button handlers for setting date ranges
@@ -229,8 +249,10 @@ const Reports = () => {
 
         <div className="table-container">
           <div className="flex justify-between mb-1">
-          <h2 className="font-medium text-lg">Sales Report</h2>
-          <button className="pdf-button	" onClick={handleClick}>Export</button>
+            <h2 className="font-medium text-lg">Sales Report</h2>
+            <button className="pdf-button	" onClick={handleClick}>
+              Export
+            </button>
           </div>
           <table className="sales-table" id="my-table">
             <thead>
@@ -300,6 +322,38 @@ const Reports = () => {
             Total Jama:{" "}
             <span className="text-emerald-500">
               {totalJama.toLocaleString("en-IN", {
+                maximumFractionDigits: 2,
+                style: "currency",
+                currency: "INR",
+              })}
+            </span>
+          </div>
+          <div>
+            Average Price:{" "}
+            <span className="text-orange-500">
+              {averagePrice.toLocaleString("en-IN", {
+                maximumFractionDigits: 2,
+                style: "currency",
+                currency: "INR",
+              })}
+            </span>
+          </div>
+          <div>
+            Total Due:{" "}
+            <span className="text-red-500">
+              {totalDue.toLocaleString("en-IN", {
+                maximumFractionDigits: 2,
+                style: "currency",
+                currency: "INR",
+              })}
+            </span>
+          </div>
+          <div>
+            Profit/Loss:{" "}
+            <span
+              className={profitOrLoss >= 0 ? "text-green-500" : "text-red-500"}
+            >
+              {profitOrLoss.toLocaleString("en-IN", {
                 maximumFractionDigits: 2,
                 style: "currency",
                 currency: "INR",

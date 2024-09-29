@@ -23,10 +23,18 @@ const Profile = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(9);
 
+  const token = localStorage.getItem("token");
+
+
   useEffect(() => {
     const fetchCust = async () => {
       try {
-        const response = await fetch("http://localhost:4000/customer");
+        const response = await fetch("http://localhost:4000/customer",{
+          headers:{
+            "Content-Type":"application/json",
+            Authorization: `Bearer ${token}`,
+          }
+        });
         const data = await response.json();
         setCustomer(data.data);
       } catch (error) {
@@ -50,13 +58,24 @@ const Profile = () => {
         try {
           const salesResponse = await fetch(
             `http://localhost:4000/sales/customer?name=${name}`
-          );
+          ,{
+            headers:{
+              "Content-Type":"application/json",
+              Authorization: `Bearer ${token}`,
+
+            }
+          });
           const salesData = await salesResponse.json();
           setSales(salesData.data);
 
           const payResponse = await fetch(
             `http://localhost:4000/payment/pay?name=${name}`
-          );
+          ,{
+            headers:{
+              "Content-Type":"application/json",
+              Authorization: `Bearer ${token}`,
+
+            }});
           const payData = await payResponse.json();
           setPay(payData.data);
         } catch (error) {

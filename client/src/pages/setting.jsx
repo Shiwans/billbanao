@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 
 const Settings = () => {
     const [userData, setUserData] = useState(null);
+    const token = localStorage.getItem("token");
 
     useEffect(() => {
         const token = localStorage.getItem('token');
@@ -10,6 +11,7 @@ const Settings = () => {
             fetch('http://localhost:4000/user', {
                 method: 'GET',
                 headers: {
+                    "Content-Type":"application/json",
                     'Authorization': `Bearer ${token}`,
                 }
             })

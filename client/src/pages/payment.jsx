@@ -69,6 +69,8 @@ const Payment = () => {
   const [customerList, setCustomerList] = useState([]);
   const [showPopup, setShowPopup] = useState(false);
 
+  const token = localStorage.getItem("token");
+
   useEffect(() => {
     const fetchCustomers = async () => {
       try {
@@ -77,6 +79,8 @@ const Payment = () => {
             method: "GET",
             headers: {
               "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+
             },
             credentials: "include",
           }),
@@ -84,6 +88,8 @@ const Payment = () => {
             method: "GET",
             headers: {
               "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+
             },
             credentials: "include",
           }),
@@ -118,6 +124,8 @@ const Payment = () => {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+
           },
           credentials: "include",
         });
@@ -141,6 +149,8 @@ const Payment = () => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+
         },
         body: JSON.stringify({
           payerType,

@@ -28,6 +28,8 @@ const Supplier = () => {
   const [currentSupplier, setCurrentSupplier] = useState(null);
   const [editingSupplierId, seteditingSupplierId] = useState(null);
 
+  const token = localStorage.getItem("token");
+
   useEffect(() => {
     const due = parseInt(totalAmount) - parseInt(totalPaid);
     setTotalDue(due);
@@ -40,7 +42,7 @@ const Supplier = () => {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
-            // 'Authorization': `Bearer ${localStorage.getItem('token')}`
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
           },
         });
         const data = await response.json();
@@ -68,33 +70,33 @@ const Supplier = () => {
     fetchSupp();
   }, []);
 
-  // const validateForm = () => {
-  //   if (!name) {
-  //     toast.error("Name is required", { position: "top-right", autoClose: 1000 });
-  //     return false;
-  //   }
-  //   // if (!phone || !/^[0-9]{10}$/.test(phone)) {
-  //   //   toast.error("Phone number is invalid (must be 10 digits)", { position: "top-right", autoClose: 1000 });
-  //   //   return false;
-  //   // }
-  //   if (!email || !/\S+@\S+\.\S+/.test(email)) {
-  //     toast.error("Invalid email address", { position: "top-right", autoClose: 1000 });
-  //     return false;
-  //   }
-  //   if (!upi) {
-  //     toast.error("UPI is required", { position: "top-right", autoClose: 1000 });
-  //     return false;
-  //   }
-  //   if (totalAmount <= 0) {
-  //     toast.error("Total amount must be greater than 0", { position: "top-right", autoClose: 1000 });
-  //     return false;
-  //   }
-  //   if (totalPaid < 0) {
-  //     toast.error("Total paid cannot be negative", { position: "top-right", autoClose: 1000 });
-  //     return false;
-  //   }
-  //   return true;
-  // };
+  const validateForm = () => {
+    if (!name) {
+      toast.error("Name is required", { position: "top-right", autoClose: 1000 });
+      return false;
+    }
+    if (!phone || !/^[0-9]{10}$/.test(phone)) {
+      toast.error("Phone number is invalid (must be 10 digits)", { position: "top-right", autoClose: 1000 });
+      return false;
+    }
+    if (!email || !/\S+@\S+\.\S+/.test(email)) {
+      toast.error("Invalid email address", { position: "top-right", autoClose: 1000 });
+      return false;
+    }
+    if (!upi) {
+      toast.error("UPI is required", { position: "top-right", autoClose: 1000 });
+      return false;
+    }
+    if (totalAmount <= 0) {
+      toast.error("Total amount must be greater than 0", { position: "top-right", autoClose: 1000 });
+      return false;
+    }
+    if (totalPaid < 0) {
+      toast.error("Total paid cannot be negative", { position: "top-right", autoClose: 1000 });
+      return false;
+    }
+    return true;
+  };
 
   const handleDelete = async (id) => {
     try {
@@ -102,6 +104,7 @@ const Supplier = () => {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`
         },
         credentials: "include",
       });
@@ -135,80 +138,20 @@ const Supplier = () => {
     }
   };
 
-  // const handlePost = async () => {
-  //   const response = await fetch("http://localhost:4000/supplier", {
-  //     method: "POST",
-  //     headers: {
-  //       "Content-Type": "application/json",
-  //     },
-  //     body: JSON.stringify({
-  //       name,
-  //       contactInfo: {
-  //         phone,
-  //         email,
-  //         upi,
-  //       },
-  //       totalPaid: parseInt(totalPaid),
-  //       totalAmount: parseInt(totalAmount),
-  //       totalDue: parseInt(totalDue),
-  //       type: "supplier",
-  //     }),
-  //     credentials: "include",
-  //   });
-
-  //   if (response.ok) {
-  //     toast.success("Supplier has been added!", {
-  //       position: "top-right",
-  //       autoClose: 1000,
-  //       hideProgressBar: false,
-  //       closeOnClick: true,
-  //       pauseOnHover: true,
-  //       draggable: true,
-  //       progress: undefined,
-  //       theme: "dark",
-  //       transition: Slide,
-  //     });
-
-  //     setName("");
-  //     setPhone("");
-  //     setEmail("");
-  //     setUpi("");
-  //     setTotalAmount("");
-  //     setTotalDue("");
-
-  //     const response = await fetch("http://localhost:4000/supplier");
-  //     const data = await response.json();
-  //     setSupplier(data.data);
-  //   } else {
-  //     toast.error("Error saving supplier!", {
-  //       position: "top-right",
-  //       autoClose: 1000,
-  //       hideProgressBar: false,
-  //       closeOnClick: true,
-  //       pauseOnHover: true,
-  //       draggable: true,
-  //       progress: undefined,
-  //       theme: "dark",
-  //       transition: Slide,
-  //     });
-  //     return false;
-  //   }
-  // };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     // if (!validateForm()) return;
 
     // // // Check if the name already exists among other suppliers
-    // const supplierExists = supplier.some(
-    //     supp => supp.name.toLowerCase() === name.toLowerCase() && supp._id !== currentSupplier?._id
-    // );
+    const supplierExists = supplier.some(
+        supp => supp.name.toLowerCase() === name.toLowerCase() && supp._id !== currentSupplier?._id
+    );
 
-    // if (supplierExists) {
-    //     toast.error("Supplier with this name already exists", { position: "top-right", autoClose: 1000 });
-    //     return;
-    // }
+    if (supplierExists) {
+        toast.error("Supplier with this name already exists", { position: "top-right", autoClose: 1000 });
+        return;
+    }
     try {
       const method = editingSupplierId ? "PUT" : "POST";
       const url = editingSupplierId
@@ -219,6 +162,8 @@ const Supplier = () => {
         method,
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+
         },
         body: JSON.stringify({
           name,
@@ -249,7 +194,14 @@ const Supplier = () => {
 
       resetForm();
 
-      const response = await fetch("http://localhost:4000/supplier");
+      const response = await fetch("http://localhost:4000/supplier",{
+        method:"GET",
+        headers:{
+          "Content-Type":"application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        credentials:true
+      });
       const data = await response.json();
       setSupplier(data.data);
     } catch (error) {

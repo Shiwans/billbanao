@@ -10,6 +10,8 @@ const Dashboard = () => {
     receivableAmount: 10000,
   });
 
+  const token = localStorage.getItem("token");
+
   useEffect(() => {
     // const fetchData = async () => {
     //   try {

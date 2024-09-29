@@ -1,20 +1,23 @@
 const mongoose = require('mongoose');
 
 const paymentSchema = new mongoose.Schema({
-    // userId: {
-    //     type: mongoose.Schema.Types.ObjectId,
-    //     ref: 'User',
-    //     required: true
-    // },
+    userId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: true 
+    },
+    customerId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Customer',
+    },
+    supplierId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Supplier',
+    },
     payerType: {
         type: String,
         required: true,
     },
-    // customerId: {
-    //     type: mongoose.Schema.Types.ObjectId,
-    //     ref: 'Customer',
-    //     required: true
-    // },
     amount: {
         type: Number,
         required: true,
@@ -30,17 +33,17 @@ const paymentSchema = new mongoose.Schema({
         required: true,
     },
     paymentDate: {
-        type: String, // Keep type as String to store the date in YYYY-MM-DD format
-        default: () => new Date().toISOString().split('T')[0], // Default to current date in YYYY-MM-DD format
+        type: String,
+        default: () => new Date().toISOString().split('T')[0], //YYYY-MM-DD
     },
 });
 
-// Ensure the paymentDate is formatted correctly before saving
 paymentSchema.pre('save', function(next) {
     if (this.paymentDate) {
         this.paymentDate = new Date(this.paymentDate).toISOString().split('T')[0]; // Format to YYYY-MM-DD
     }
     next();
 });
+
 
 module.exports = mongoose.model('Payment', paymentSchema);

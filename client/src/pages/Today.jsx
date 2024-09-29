@@ -85,6 +85,8 @@ const Today = () => {
   const [activeTab, setActiveTab] = useState("customer");
   const today = new Date().toISOString().split("T")[0];
 
+  const token = localStorage.getItem("token");
+
   useEffect(() => {
     const fetchSalesData = async () => {
       try {
@@ -98,6 +100,7 @@ const Today = () => {
             method: "GET",
             headers: {
               "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
             },
             credentials: "include",
           }
@@ -159,7 +162,8 @@ const Today = () => {
     try {
       const response = await fetch("http://localhost:4000/sales", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json",Authorization: `Bearer ${token}`,
+      },
         body: JSON.stringify({
           date: today,
           name,
@@ -261,6 +265,8 @@ const Today = () => {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+
         },
         credentials: "include",
       });

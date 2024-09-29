@@ -1,22 +1,27 @@
 const Payment = require('../Model/Payment')
 const Customer =  require('../Model/Customer')
 
-const fetchPayment =(req,res)=>{
-    res.send("write code to fetch")
+const fetchPayment =async (req,res)=>{
+    try {
+        const payments = await Payment.find({ userId: req.user.id }).sort({ createdAt: -1 });
+        res.status(200).json({ message: 'Fetched all payments successfully', payments });
+    } catch (error) {
+        console.error('Error fetching payments', error);
+        res.status(500).json({ message: 'Error fetching payments', error });
+    }
 }
 
 const addPayment =async (req,res) =>{
     try{
         const { payerType,payerName,amount,paymentDate,method } = req.body
         const newPayment = new Payment({
-            payerType,payerName,amount,paymentDate,method
+            payerType,payerName,amount,paymentDate,method,
+            userId:req.user.id 
         })
-        await newPayment.save()
-        // await Customer.findOneAndUpdate(
-        //     { name: payerName },
-        //     {$inc: {totalJama: amount}},
-        //     // { $inc: {totalDue:due}}
-        // );
+        await Customer.findOneAndUpdate(
+            { name: payerName,userId:req.user.id },
+            { $inc: { totalJama: amount } } // Assuming totalJama is the correct field to update
+        );
         res.status(200).json({message:'new payment added',newPayment})
 
     }catch(error){
@@ -34,10 +39,7 @@ const fetchNameDate =async(req,res) =>{
         const payment = await Payment.find({
             payerName,
             payerDate,
-            // date: {
-                // $gte: targetDate,
-                // $lt: endDate
-            // }
+            userId: req.user.id
         });
 
         if (payment.length === 0) {
@@ -52,7 +54,7 @@ const fetchNameDate =async(req,res) =>{
 
 const fetch10 = async (req,res) =>{
     try {
-      const payments = await Payment.find().sort({ createdAt: -1 }).limit(10);
+        const payments = await Payment.find({ userId: req.user.id }).sort({ createdAt: -1 }).limit(10);
       res.json(payments);
     } catch (error) {
       res.status(500).json({ message: "Error fetching payments" });
