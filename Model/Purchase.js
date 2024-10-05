@@ -1,15 +1,15 @@
 // const mongoose = require('mongoose');
 // const Schema = mongoose.Schema;
 
-// const salesSchema = new mongoose.Schema({
+// const purchaseSchema = new mongoose.Schema({
 //     userId: {
 //         type: mongoose.Schema.Types.ObjectId,
-//         ref: 'User', // Reference to the User model
-//         required: true // Ensure every sale is associated with a user
+//         ref: 'User', 
+//         required: true 
 //     },
-//     customerId: {
+//     supplierId: {
 //         type: mongoose.Schema.Types.ObjectId,
-//         ref: 'Customer',
+//         ref: 'Supplier', // Reference to the Supplier model
 //     },
 //     name: {
 //         type: String,
@@ -52,14 +52,16 @@
 //     },
 //     type: {
 //         type: String,
-//         default: 'customer',
+//         default:'supplier',
 //         required: true
 //     }
 // }, { timestamps: true });
 
-// salesSchema.pre('save', function (next) {
-//         this.type = 'customer';
+// purchaseSchema.pre('save', function (next) {
 
+//     this.type = 'supplier';
+
+//     // Handle payment details based on payment status
 //     if (this.paymentStatus === 'paid') {
 //         this.paymentDetails.paidAmount = this.amount;
 //         this.paymentDetails.dueAmount = 0;
@@ -73,7 +75,6 @@
 //         this.paymentDetails.dueAmount = this.amount;
 //     }
 
-//     // Normalize the date field
 //     if (this.date) {
 //         this.date = new Date(this.date).toISOString().split('T')[0];
 //     }
@@ -83,19 +84,21 @@
 // });
 
 
-// module.exports = mongoose.model('Sale', salesSchema);
+// module.exports = mongoose.model('Purchase', purchaseSchema);
+
+
 
 const mongoose = require('mongoose');
 
-const salesSchema = new mongoose.Schema({
+const purchaseSchema = new mongoose.Schema({
     userId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User', 
         required: true 
     },
-    customerId: {
+    supplierId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Customer',
+        ref: 'Supplier', 
     },
     name: {
         type: String,
@@ -138,13 +141,13 @@ const salesSchema = new mongoose.Schema({
     },
     type: {
         type: String,
-        default: 'customer',
+        default: 'supplier',
         required: true
     }
 }, { timestamps: true });
 
-salesSchema.pre('save', function (next) {
-    this.type = 'customer';
+purchaseSchema.pre('save', function (next) {
+    this.type = 'supplier';
 
     // Calculate amount before saving
     this.amount = this.quantity * this.price; 
@@ -163,7 +166,6 @@ salesSchema.pre('save', function (next) {
         this.paymentDetails.dueAmount = this.amount;
     }
 
-    // Normalize the date field
     if (this.date) {
         this.date = new Date(this.date).toISOString().split('T')[0];
     }
@@ -171,4 +173,4 @@ salesSchema.pre('save', function (next) {
     next();
 });
 
-module.exports = mongoose.model('Sale', salesSchema);
+module.exports = mongoose.model('Purchase', purchaseSchema);

@@ -16,8 +16,8 @@ import {
 } from "@mui/material";
 import { makeStyles } from "@mui/styles";
 import { toast, Slide } from "react-toastify";
-import UpdateSale from "../components/UpdateSale";
-import DateQuery from "../components/DateQuery";
+import UpdatePurchase from "../components/UpdatePurchase";
+import PurchaseQuery from "../components/PurchaseQuery";
 
 const useStyles = makeStyles((theme) => ({
   formContainer: {
@@ -69,18 +69,18 @@ const Sale = () => {
   const [dueAmount, setDueAmount] = useState("");
   const [totalAmount, setTotalAmount] = useState(0);
   const [name, setName] = useState("");
-  const [customerList, setCustomerList] = useState([]); //for listing dropdown
-  const [recentSales, setRecentSales] = useState([]); //for listing last 10 sales in table
+  const [supplierList, setSupplierList] = useState([]); //for listing dropdown
+  const [recentPurchase, setRecentPurchase] = useState([]); //for listing last 10 purchase in table
   const [showPopup, setShowPopup] = useState(false); //for quering certain date's data
-const [customerId,setCustomerId] = useState("")
+const [supplierId,setSupplierId] = useState("")
 const [type,setType] = useState("")
 const [quantityError, setQuantityError] = useState("");
 const [priceError, setPriceError] = useState("");
 
   const token = localStorage.getItem("token");
-  const fetchSales = useCallback(async () => {
+  const fetchPurchase = useCallback(async () => {
     try {
-      const response = await fetch("http://localhost:4000/sales/10", {
+      const response = await fetch("http://localhost:4000/purchase/10", {
         method: "GET",
         headers: {
           // "Content-Type": "application/json",
@@ -90,16 +90,16 @@ const [priceError, setPriceError] = useState("");
       });
       const data = await response.json();
 
-      console.log("recent sales from sale.js",data)
-      setRecentSales(data.data);
+      console.log("recent sales from purchase.js",data)
+      setRecentPurchase(data.data);
     } catch (error) {
-      console.error("Error fetching sales data:", error);
+      console.error("Error fetching purchase data:", error);
     }
   },[token]);
   useEffect(() => {
-    const fetchCustomers = async () => {
+    const fetchSupplier = async () => {
       try {
-        const response = await fetch("http://localhost:4000/customer", {
+        const response = await fetch("http://localhost:4000/supplier", {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -108,16 +108,16 @@ const [priceError, setPriceError] = useState("");
           credentials: "include",
         });
         const result = await response.json();
-        setCustomerList(result.data);
+        setSupplierList(result.data);
       } catch (error) {
-        console.error("Unable to fetch customer list", error);
-        setCustomerList([]);
+        console.error("Unable to fetch supplier list", error);
+        setSupplierList([]);
       }
     };
-    fetchCustomers();
+    fetchSupplier();
 
-    fetchSales();
-  }, [showPopup, token,fetchSales]);
+    fetchPurchase();
+  }, [showPopup, token,fetchPurchase]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -126,7 +126,7 @@ const [priceError, setPriceError] = useState("");
       setQuantityError("Quantity must be greater than zero.");
       return;
     }
-  
+
     if (price <= 0) {
       setPriceError("Price must be greater than zero.");
       return;
@@ -146,8 +146,8 @@ const [priceError, setPriceError] = useState("");
       updatedPaidAmount = 0;
       updatedDueAmount = total;
     }
-    console.log('customerType is:',type ,'customerid is: ',customerId)
-    const response = await fetch("http://localhost:4000/sales", {
+    console.log('supplierType is:',type ,'supplierId is: ',supplierId)
+    const response = await fetch("http://localhost:4000/purchase", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -165,15 +165,15 @@ const [priceError, setPriceError] = useState("");
           dueAmount: parseInt(updatedDueAmount),
         },
         type,
-        customerId,
+        supplierId,
 
       }),
       credentials: "include",
     });
 
-    await fetchSales();
+    await fetchPurchase();
     if (response.ok) {
-      toast.success("Sale has been added!", {
+      toast.success("purchase has been added!", {
         position: "top-right",
         autoClose: 1000,
         hideProgressBar: false,
@@ -185,7 +185,7 @@ const [priceError, setPriceError] = useState("");
         transition: Slide,
       });
     } else {
-      toast.error("Error saving Sale!", {
+      toast.error("Error saving purchase!", {
         position: "top-right",
         autoClose: 1000,
         hideProgressBar: false,
@@ -207,8 +207,6 @@ const [priceError, setPriceError] = useState("");
     setPaidAmount("");
     setDueAmount("");
     setTotalAmount("");
-    setQuantityError("")
-    setPriceError("")
   };
 
   const renderPaymentDetails = () =>
@@ -259,17 +257,17 @@ const [priceError, setPriceError] = useState("");
     </div>
   );
   let modal = (
-    <UpdateSale onClose={handleClose} actionBar={actionBar}>
-      <h1>Update Sale data</h1>
-      <DateQuery />
-    </UpdateSale>
+    <UpdatePurchase onClose={handleClose} actionBar={actionBar}>
+      <h1>Update Purchase data</h1>
+      <PurchaseQuery />
+    </UpdatePurchase>
   );
 
   return (
     <div className={classes.noScroll}>
       <div className="flex justify-between mt-2">
         <Typography variant="h4" gutterBottom>
-          Sale
+          Purchase
         </Typography>
         <Grid item xs={12}>
           <Button
@@ -278,7 +276,7 @@ const [priceError, setPriceError] = useState("");
             type="submit"
             onClick={handleClick}
           >
-            Change Sale data
+            Change Purchase data
           </Button>
           {showPopup && modal}
         </Grid>
@@ -296,6 +294,7 @@ const [priceError, setPriceError] = useState("");
               onChange={(e) => setDate(e.target.value)}
               fullWidth
               required
+              InputLabelProps={{ shrink: true }}
             />
           </Grid>
 
@@ -303,30 +302,30 @@ const [priceError, setPriceError] = useState("");
             <TextField
               select
               className={classes.textField}
-              label="Customer Name"
+              label="Supplier Name"
               value={name}
               // onChange={(e) => setName(e.target.value)}
               onChange={(e) => {
                 setName(e.target.value);
                 // Find the selected customer ID based on the selected name
-                const selectedCustomer = customerList.find(customer => customer.name === e.target.value);
-                setCustomerId(selectedCustomer ? selectedCustomer._id : "");
-                setType(selectedCustomer ? selectedCustomer.type : "");
+                const selectedSupplier = supplierList.find(supplier => supplier.name === e.target.value);
+                setSupplierId(selectedSupplier ? selectedSupplier._id : "");
+                setType(selectedSupplier ? selectedSupplier.type : "");
               }}
               fullWidth
               required
             >
               <MenuItem value="" disabled>
-                Select Customer
+                Select Supplier
               </MenuItem>
-              {customerList.length > 0 ? (
-                customerList.map((customer) => (
-                  <MenuItem key={customer._id} value={customer.name}>
-                    {customer.name}
+              {supplierList.length > 0 ? (
+                supplierList.map((supplier) => (
+                  <MenuItem key={supplier._id} value={supplier.name}>
+                    {supplier.name}
                   </MenuItem>
                 ))
               ) : (
-                <MenuItem disabled>No customers found</MenuItem>
+                <MenuItem disabled>No suppliers found</MenuItem>
               )}
             </TextField>
           </Grid>
@@ -340,8 +339,8 @@ const [priceError, setPriceError] = useState("");
               onChange={(e) => setQuantity(e.target.value)}
               fullWidth
               required
-              error={Boolean(quantityError)} // Set error state
-              helperText={quantityError} // Display error message
+              error={Boolean(quantityError)}
+              helperText={quantityError}
             />
           </Grid>
 
@@ -354,8 +353,8 @@ const [priceError, setPriceError] = useState("");
               onChange={(e) => setPrice(e.target.value)}
               fullWidth
               required
-              error={Boolean(priceError)} // Set error state
-              helperText={priceError} // Display error message
+              error={Boolean(priceError)}
+              helperText={priceError}
             />
           </Grid>
 
@@ -388,14 +387,14 @@ const [priceError, setPriceError] = useState("");
 
       {/* Recent Sales Table */}
       <Typography variant="h6" style={{ marginTop: "30px" }}>
-        Recent Sales
+        Recent Purchases
       </Typography>
       <TableContainer component={Paper}>
         <Table>
           <TableHead>
             <TableRow>
               <TableCell>Date</TableCell>
-              <TableCell>Customer</TableCell>
+              <TableCell>Supplier</TableCell>
               <TableCell>Quantity</TableCell>
               <TableCell>Price (₹)</TableCell>
               <TableCell>Total (₹)</TableCell>
@@ -405,15 +404,15 @@ const [priceError, setPriceError] = useState("");
             </TableRow>
           </TableHead>
           <TableBody>
-            {recentSales.length > 0 ? (
-              recentSales.map((sale, index) => (
+            {recentPurchase.length > 0 ? (
+              recentPurchase.map((purchase, index) => (
                 <TableRow key={index} className={classes.tableRowHover}>
-                  <TableCell>{sale.date}</TableCell>
-                  <TableCell>{sale.name}</TableCell>
-                  <TableCell>{sale.quantity}</TableCell>
-                  <TableCell>{sale.price}</TableCell>
+                  <TableCell>{purchase.date}</TableCell>
+                  <TableCell>{purchase.name}</TableCell>
+                  <TableCell>{purchase.quantity}</TableCell>
+                  <TableCell>{purchase.price}</TableCell>
                   <TableCell>
-                    {(sale.quantity * sale.price)
+                    {(purchase.quantity * purchase.price)
                       .toFixed(2)
                       .toLocaleString("en-IN", {
                         maximumFractionDigits: 2,
@@ -421,17 +420,17 @@ const [priceError, setPriceError] = useState("");
                         currency: "INR",
                       })}
                   </TableCell>
-                  <TableCell>{sale.paymentStatus}</TableCell>
-                  <TableCell>{sale.paymentDetails.paidAmount}</TableCell>
-                  <TableCell>{sale.paymentDetails.dueAmount}</TableCell>
-                  {/* <TableCell>{sale.paymentStatus === "paid" ? (sale.quantity * sale.price).toFixed(2) : sale.paidAmount}</TableCell> */}
-                  {/* <TableCell>{sale.paymentStatus === "unpaid" ? (sale.quantity * sale.price).toFixed(2) : sale.dueAmount}</TableCell> */}
+                  <TableCell>{purchase.paymentStatus}</TableCell>
+                  <TableCell>{purchase.paymentDetails.paidAmount}</TableCell>
+                  <TableCell>{purchase.paymentDetails.dueAmount}</TableCell>
+                  {/* <TableCell>{purchase.paymentStatus === "paid" ? (purchase.quantity * purchase.price).toFixed(2) : purchase.paidAmount}</TableCell> */}
+                  {/* <TableCell>{purchase.paymentStatus === "unpaid" ? (purchase.quantity * purchase.price).toFixed(2) : purchase.dueAmount}</TableCell> */}
                 </TableRow>
               ))
             ) : (
               <TableRow>
                 <TableCell colSpan={8} align="center">
-                  No Sales found
+                  No Purchases found
                 </TableCell>
               </TableRow>
             )}

@@ -1,9 +1,11 @@
 const Supplier = require('../Model/Supplier');
+const Sale = require('../Model/Sale')
+const Payment= require('../Model/Payment')
 
 // Fetch all suppliers
 const fetchData = async (req, res) => {
     try {
-        const data = await Supplier.find();
+        const data = await Supplier.find({ userId: req.user.id });
         res.status(200).json({ message: 'Here are all the suppliers', data });
     } catch (error) {
         console.error('Error fetching suppliers:', error);
@@ -14,24 +16,21 @@ const fetchData = async (req, res) => {
 // Add a new supplier
 const addSupplier = async (req, res) => {
     try {
-        const { name, contactInfo, totalAmount, totalPaid,totalDue } = req.body;
+        const { name, contactInfo, type, totalAmount, totalPaid, totalDue } = req.body;
         if (!name || !contactInfo || !contactInfo.phone || !contactInfo.email || totalAmount === undefined || totalPaid === undefined || totalDue === undefined) {
-            return res.status(400).json({ message: 'All fields are required: ' });
+            return res.status(400).json({ message: 'All fields are required' });
         }
-//         // Ensure totalAmount and totalPaid are valid numbers
-//         if (typeof totalAmount !== 'number' || totalAmount < 0) {
-//             return res.status(400).json({ message: 'Total amount must be a non-negative number' });
-//         }
 
-        const supplierExists = await Supplier.findOne({ name });
+        const supplierExists = await Supplier.findOne({ name, userId: req.user.id });
         if (supplierExists) {
             return res.status(400).json({ message: 'Supplier already exists' });
         }
 
-
         const newSupplier = new Supplier({
+            userId: req.user.id,
             name,
             contactInfo,
+            type,
             totalAmount,
             totalPaid,
             totalDue,
@@ -48,37 +47,28 @@ const addSupplier = async (req, res) => {
 // Update supplier details
 const updateSupplier = async (req, res) => {
     try {
-        const { id } = req.params;
-        const { name, contactInfo, totalAmount, totalPaid } = req.body;
-
-         // Check if the supplier ID is valid
-        if (!id) {
-            return res.status(400).json({ message: 'Supplier ID is required' });
-        }
-
-        // Check if all required fields are provided
-        if (!name || !contactInfo || !contactInfo.email || !contactInfo.phone || !contactInfo.upi|| totalAmount === undefined || totalPaid === undefined || totalDue===undefined) {
+        const { name, contactInfo, type, totalAmount, totalPaid, totalDue } = req.body;
+        const supplierId = req.params.id;
+        if (!name || !contactInfo || !contactInfo.email || !contactInfo.phone || !contactInfo.upi || totalAmount === undefined || totalPaid === undefined || totalDue === undefined) {
             return res.status(400).json({ message: 'All fields are required for updating' });
         }
 
-        
-        // Check if another supplier with the same name exists, excluding the current supplier
-        const supplierExists = await Supplier.findOne({ name, _id: { $ne: id } });
-        if (supplierExists) {
-            return res.status(400).json({ message: 'A supplier with the same name already exists' });
-        }
+        // const supplierExists = await Supplier.findOne({ name, _id: { $ne: id }, userId: req.user.id });
+        // if (supplierExists) {
+        //     return res.status(400).json({ message: 'A supplier with the same name already exists' });
+        // }    
 
-
-        const updatedSupplier = await Supplier.findByIdAndUpdate(
-            id,
+        const updatedSupplier = await Supplier.findOneAndUpdate(
+            { _id: supplierId, userId: req.user.id },
             {
                 name,
                 contactInfo,
+                type,
                 totalAmount,
                 totalPaid,
                 totalDue,
             },
-            { new: true,runValidators: true }
+            { new: true, runValidators: true }
         );
 
         if (!updatedSupplier) {
@@ -92,20 +82,25 @@ const updateSupplier = async (req, res) => {
     }
 };
 
+
 // Delete a supplier
 const deleteSupplier = async (req, res) => {
     try {
-        const { id } = req.params;
-
-        const deletedSupplier = await Supplier.findByIdAndDelete(id);
+        const deletedSupplier = await Supplier.findOne({ _id: req.params.id, userId: req.user.id });
 
         if (!deletedSupplier) {
             return res.status(404).json({ message: 'Supplier not found' });
         }
 
-        res.status(200).json({ message: 'Supplier deleted', deletedSupplier });
+       // Delete related payments using the supplierId
+       await Payment.deleteMany({ supplierId: req.params.id });
+       // Assuming you have a Sale model to delete related sales as well
+       await Sale.deleteMany({ supplierId: req.params.id });
+        await Supplier.findByIdAndDelete(req.params.id);
+
+        res.status(200).json({ message: 'Supplier and related sales and payments deleted successfully' });
     } catch (error) {
-        console.error('Error deleting supplier:', error.message);
+        console.error('Error deleting supplier:', error);
         res.status(500).json({ message: 'Error deleting supplier' });
     }
 };

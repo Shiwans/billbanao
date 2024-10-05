@@ -12,6 +12,7 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  getNativeSelectUtilityClasses,
 } from "@mui/material";
 import { toast, Slide } from "react-toastify";
 
@@ -26,7 +27,7 @@ const Supplier = () => {
   const [supplier, setSupplier] = useState([]);
   const [isEditing, setIsEditing] = useState(false);
   const [currentSupplier, setCurrentSupplier] = useState(null);
-  const [editingSupplierId, seteditingSupplierId] = useState(null);
+  const [editingSupplierId, setEditingSupplierId] = useState(null);
 
   const token = localStorage.getItem("token");
 
@@ -46,12 +47,7 @@ const Supplier = () => {
           },
         });
         const data = await response.json();
-        // console.log(data); // Log the structure of data
-        if (Array.isArray(data.data)) {
           setSupplier(data.data);
-        } else {
-          console.error("Expected an array, got:", data.data);
-        }
       } catch (error) {
         console.error("Unable to fetch supplier", error);
         toast.error("Unable to fetch supplier!", {
@@ -68,35 +64,7 @@ const Supplier = () => {
       }
     };
     fetchSupp();
-  }, []);
-
-  const validateForm = () => {
-    if (!name) {
-      toast.error("Name is required", { position: "top-right", autoClose: 1000 });
-      return false;
-    }
-    if (!phone || !/^[0-9]{10}$/.test(phone)) {
-      toast.error("Phone number is invalid (must be 10 digits)", { position: "top-right", autoClose: 1000 });
-      return false;
-    }
-    if (!email || !/\S+@\S+\.\S+/.test(email)) {
-      toast.error("Invalid email address", { position: "top-right", autoClose: 1000 });
-      return false;
-    }
-    if (!upi) {
-      toast.error("UPI is required", { position: "top-right", autoClose: 1000 });
-      return false;
-    }
-    if (totalAmount <= 0) {
-      toast.error("Total amount must be greater than 0", { position: "top-right", autoClose: 1000 });
-      return false;
-    }
-    if (totalPaid < 0) {
-      toast.error("Total paid cannot be negative", { position: "top-right", autoClose: 1000 });
-      return false;
-    }
-    return true;
-  };
+  }, [token]);
 
   const handleDelete = async (id) => {
     try {
@@ -138,27 +106,17 @@ const Supplier = () => {
     }
   };
 
+
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // if (!validateForm()) return;
-
-    // // // Check if the name already exists among other suppliers
-    const supplierExists = supplier.some(
-        supp => supp.name.toLowerCase() === name.toLowerCase() && supp._id !== currentSupplier?._id
-    );
-
-    if (supplierExists) {
-        toast.error("Supplier with this name already exists", { position: "top-right", autoClose: 1000 });
-        return;
-    }
     try {
       const method = editingSupplierId ? "PUT" : "POST";
       const url = editingSupplierId
         ? `http://localhost:4000/supplier/${editingSupplierId}`
         : "http://localhost:4000/supplier";
-      // const response = await fetch(`http://localhost:4000/supplier/${currentSupplier._id}`, {
-      await fetch(url, {
+      const response = await fetch(url, {
         method,
         headers: {
           "Content-Type": "application/json",
@@ -179,8 +137,12 @@ const Supplier = () => {
         }),
         credentials: "include",
       });
+      const data = await response.json();
 
-      toast.success("Supplier updated successfully", {
+      if (response.ok) {
+      toast.success(editingSupplierId
+        ? "Supplier has been updated!"
+        : "Supplier has been added!", {
         position: "top-right",
         autoClose: 1000,
         hideProgressBar: false,
@@ -200,10 +162,16 @@ const Supplier = () => {
           "Content-Type":"application/json",
           Authorization: `Bearer ${token}`,
         },
-        credentials:true
+        credentials:"include"
       });
       const data = await response.json();
       setSupplier(data.data);
+    } else {
+      toast.error(`Error saving customer! ${data.message || 'Please try again.'}`, {
+        position: "top-right",
+        autoClose: 1000,
+      });
+    }
     } catch (error) {
       console.error(error);
       toast.error("Error updating supplier!", {
@@ -220,15 +188,16 @@ const Supplier = () => {
     }
   };
 
-const handleEdit = (customer) => {
-  seteditingSupplierId(customer._id);
-  setName(customer.name);
-  setPhone(customer.contactInfo.phone);
-  setEmail(customer.contactInfo.email);
-  setUpi(customer.contactInfo.upi);
-  setTotalAmount(customer.totalAmount);
-  setTotalPaid(customer.totalPaid);
-  setTotalDue(customer.totalDue);
+const handleEdit = (supplier) => {
+  setEditingSupplierId(supplier._id);
+  setName(supplier.name);
+  setPhone(supplier.contactInfo.phone);
+  setEmail(supplier.contactInfo.email);
+  setUpi(supplier.contactInfo.upi);
+  setTotalAmount(supplier.totalAmount);
+  setTotalPaid(supplier.totalPaid);
+  setTotalDue(supplier.totalDue);
+  setIsEditing(true)
 };
 
 const resetForm = () => {
@@ -239,7 +208,8 @@ const resetForm = () => {
   setTotalAmount("");
   setTotalPaid("");
   setTotalDue("");
-  seteditingSupplierId(null);
+  setEditingSupplierId(null);
+  setIsEditing(false)
 };
 
 return (
@@ -266,6 +236,7 @@ return (
           <Grid item xs={12} sm={6}>
             <TextField
               required
+              type="number"
               id="phone"
               name="phone"
               label="Phone"
@@ -273,8 +244,8 @@ return (
               variant="outlined"
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
-              type="tel"
-              inputProps={{ minLength: 10, maxLength: 10 }}
+              error={phone.length !== 10 && phone.length > 0} // Show error if not exactly 10 digits
+                helperText={phone.length !== 10 && phone.length > 0 ? "Phone number must be exactly 10 digits." : ""}
             />
           </Grid>
           <Grid item xs={12} sm={6}>
@@ -327,9 +298,9 @@ return (
             />
           </Grid>
           <Grid item xs={12}>
-            <Button type="submit" variant="contained" color="primary">
-              {isEditing ? "Update Supplier" : "Add Supplier"}
-            </Button>
+          <Button type="submit" variant="contained" color="primary">
+  {editingSupplierId ? "Update Supplier" : "Add Supplier"}
+</Button>
           </Grid>
         </Grid>
       </form>

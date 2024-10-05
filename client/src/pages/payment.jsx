@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   Grid,
   TextField,
@@ -12,6 +12,10 @@ import {
   TableHead,
   TableRow,
   Paper,
+  FormLabel,
+  RadioGroup,
+  FormControlLabel,
+  Radio
 } from "@mui/material";
 import { makeStyles } from "@mui/styles";
 import { toast, Slide } from "react-toastify";
@@ -68,6 +72,7 @@ const Payment = () => {
   const [recentPayments, setRecentPayments] = useState([]);
   const [customerList, setCustomerList] = useState([]);
   const [showPopup, setShowPopup] = useState(false);
+  const [paymentType, setPaymentType] = useState("received"); // Default to "received"
 
   const token = localStorage.getItem("token");
 
@@ -80,7 +85,6 @@ const Payment = () => {
             headers: {
               "Content-Type": "application/json",
               Authorization: `Bearer ${token}`,
-
             },
             credentials: "include",
           }),
@@ -89,7 +93,6 @@ const Payment = () => {
             headers: {
               "Content-Type": "application/json",
               Authorization: `Bearer ${token}`,
-
             },
             credentials: "include",
           }),
@@ -115,31 +118,47 @@ const Payment = () => {
     };
 
     fetchCustomers();
-  }, []);
-
-  useEffect(() => {
-    const fetch10Pay = async () => {
-      try {
-        const response = await fetch("http://localhost:4000/payment/10", {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-
-          },
-          credentials: "include",
-        });
-        const result = await response.json();
-        setRecentPayments(result);
-        console.log('10 payemnt data',recentPayments)
-
-      } catch (error) {
-        console.error("Error fetching payment data:", error);
-      }
-    };
 
     fetch10Pay();
-  }, [showPopup]);
+  }, [token]);
+
+  // useEffect(() => {
+  // const fetch10Pay = async () => {
+  //   try {
+  //     const response = await fetch("http://localhost:4000/payment/10", {
+  //       method: "GET",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //         Authorization: `Bearer ${token}`,
+
+  //       },
+  //       credentials: "include",
+  //     });
+  //     const result = await response.json();
+  //     setRecentPayments(result);
+
+  //   } catch (error) {
+  //     console.error("Error fetching payment data:", error);
+  //   }
+  // }
+  //   fetch10Pay();
+  // }, [showPopup,token])
+  const fetch10Pay = useCallback(async () => {
+    try {
+      const response = await fetch("http://localhost:4000/payment/10", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        credentials: "include",
+      });
+      const result = await response.json();
+      setRecentPayments(result);
+    } catch (error) {
+      console.error("Error fetching payment data:", error);
+    }
+  }, [token, showPopup, recentPayments]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -150,7 +169,6 @@ const Payment = () => {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
-
         },
         body: JSON.stringify({
           payerType,
@@ -158,10 +176,11 @@ const Payment = () => {
           payerName: name,
           amount: parseInt(amount, 10),
           paymentDate: date,
+          paymentType
         }),
         credentials: "include",
       });
-
+      await fetch10Pay();
       if (response.ok) {
         toast.success("Payment has been added!", {
           position: "top-right",
@@ -255,6 +274,22 @@ const Payment = () => {
       <form onSubmit={handleSubmit} className={classes.formContainer}>
         <Grid container spacing={2}>
           <Grid item xs={12}>
+            <FormLabel component="legend">Payment Type</FormLabel>
+            <RadioGroup
+              row
+              value={paymentType}
+              onChange={(e) => setPaymentType(e.target.value)}
+            >
+              <FormControlLabel
+                value="received"
+                control={<Radio />}
+                label="Received"
+              />
+              <FormControlLabel value="paid" control={<Radio />} label="Paid" />
+            </RadioGroup>
+          </Grid>
+
+          <Grid item xs={12}>
             <TextField
               label="Payer Type"
               className={classes.textField}
@@ -295,6 +330,7 @@ const Payment = () => {
               onChange={(e) => setAmount(e.target.value)}
               fullWidth
               required
+              min="1"
             />
           </Grid>
 
@@ -327,12 +363,7 @@ const Payment = () => {
             </TextField>
           </Grid>
           <Grid item xs={12}>
-            <Button
-              type="submit"
-              variant="contained"
-              color="primary"
-              fullWidth
-            >
+            <Button type="submit" variant="contained" color="primary" fullWidth>
               Submit Payment
             </Button>
           </Grid>
@@ -349,6 +380,7 @@ const Payment = () => {
             <TableHead>
               <TableRow>
                 <TableCell>Date</TableCell>
+                <TableCell>PaymentType</TableCell>
                 <TableCell>Type</TableCell>
                 <TableCell>Name</TableCell>
                 <TableCell>Amount</TableCell>
@@ -359,18 +391,15 @@ const Payment = () => {
               {/* {recentPayments.length >0? ( */}
 
               {recentPayments.map((payment, index) => (
-                  <TableRow
-                    key={index}
-                    className={classes.tableRowHover}
-                  >
-                    <TableCell>{payment.paymentDate}</TableCell>
-                    <TableCell>{payment.payerType}</TableCell>
-                    <TableCell>{payment.payerName}</TableCell>
-                    <TableCell>{payment.amount}</TableCell>
-                    <TableCell>{payment.method}</TableCell>
-                  </TableRow>
-                ))
-              }
+                <TableRow key={index} className={classes.tableRowHover}>
+                  <TableCell>{payment.paymentDate}</TableCell>
+                  <TableCell>{payment.paymentType}</TableCell>
+                  <TableCell>{payment.payerType}</TableCell>
+                  <TableCell>{payment.payerName}</TableCell>
+                  <TableCell>{payment.amount}</TableCell>
+                  <TableCell>{payment.method}</TableCell>
+                </TableRow>
+              ))}
               {/* // : ( */}
               {/* //   <TableRow> */}
               {/* //     <TableCell colSpan={5} align="center"> */}

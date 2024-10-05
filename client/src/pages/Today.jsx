@@ -84,48 +84,129 @@ const Today = () => {
   const [allSales, setAllSales] = useState([]); // Initialize as an empty array
   const [activeTab, setActiveTab] = useState("customer");
   const today = new Date().toISOString().split("T")[0];
+  const [customerId,setCustomerId] = useState("")
+const [type,setType] = useState("")
 
   const token = localStorage.getItem("token");
+  useEffect(() => {
+    const fetchSales = async () => {
+      try {
+        const salesResponse = await fetch("http://localhost:4000/sales", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          credentials: "include",
+        });
+        const salesResult = await salesResponse.json();
+        setAllSales(salesResult.data);
+      } catch (error) {
+        console.log("Error fetching sales:", error);
+      }
+    };
+      fetchSales();
+  }, [token,]);
+  
+  //there is issue with fetching data it's fethcing all the data in there so 
+  // useEffect(() => {
+  //   const fetchSalesData = async () => {
+  //     try {
+  //       let query = {
+  //         start: today,
+  //         end: today + 1,
+  //       };
+  //       const response = await fetch(
+  //         `http://localhost:4000/sales/day?${query}`,
+  //         {
+  //           method: "GET",
+  //           headers: {
+  //             "Content-Type": "application/json",
+  //             Authorization: `Bearer ${token}`,
+  //           },
+  //           credentials: "include",
+  //         }
+  //       ); // Make sure backend route matches
+  //       const result = await response.json();
+  //       setAllSales(result.data);
+  //     } catch (error) {
+  //       console.error("Error fetching sales data", error);
+  //       setAllSales([]);
+  //     }
+  //   };
+  //   fetchSalesData();
+  // }, [today, token]);
 
   useEffect(() => {
     const fetchSalesData = async () => {
       try {
-        let query = {
-          start: today,
-          end: today + 1,
-        };
+        // Get today's date in YYYY-MM-DD format (no time component)
+        const startOfDay = new Date(today);
+        startOfDay.setHours(0, 0, 0, 0); // Set to start of the day (00:00:00)
+        
+        // Format the date to YYYY-MM-DD without time
+        const formatDate = (date) => date.toISOString().split('T')[0];
+  
+        const start = formatDate(startOfDay);
+        const end = formatDate(startOfDay); // same day, without time
+  
+        const query = new URLSearchParams({
+          start,
+          end,
+        });
+  
         const response = await fetch(
-          `http://localhost:4000/sales/day?${query}`,
+          `http://localhost:4000/sales/day?${query.toString()}`,
           {
             method: "GET",
             headers: {
               "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
+              Authorization: `Bearer ${token}`, 
             },
             credentials: "include",
           }
-        ); // Make sure backend route matches
+        );
+  
         const result = await response.json();
-        setAllSales(result);
+        if (response.ok) {
+          setAllSales(result.data);
+        } else {
+          console.error("Error in response:", result);
+          setAllSales([]);
+        }
       } catch (error) {
         console.error("Error fetching sales data", error);
         setAllSales([]);
       }
     };
+  
     fetchSalesData();
-  }, []);
+  }, [today, token]);
+  
 
   useEffect(() => {
     const fetchCustomersAndSuppliers = async () => {
       try {
-        const customerResponse = await fetch("http://localhost:4000/customer");
-        const supplierResponse = await fetch("http://localhost:4000/supplier");
+        const customerResponse = await fetch("http://localhost:4000/customer", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            'Authorization': `Bearer ${token}`
+          },
+        });
+        const supplierResponse = await fetch("http://localhost:4000/supplier", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            'Authorization': `Bearer ${token}`
+          },
+        });
 
         const customerResult = await customerResponse.json();
         const supplierResult = await supplierResponse.json();
 
-        setCustomer(customerResult);
-        setSupplier(supplierResult);
+        setCustomer(customerResult.data);
+        setSupplier(supplierResult.data);
         // setList([...customerResult.data, ...supplierResult.data]);
       } catch (error) {
         console.error("Error fetching data", error);
@@ -162,19 +243,38 @@ const Today = () => {
     try {
       const response = await fetch("http://localhost:4000/sales", {
         method: "POST",
-        headers: { "Content-Type": "application/json",Authorization: `Bearer ${token}`,
-      },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        // body: JSON.stringify({
+        //   date: today,
+        //   name,
+        //   quantity: Number(quantity),
+        //   price: Number(value),
+        //   paymentStatus: payment,
+        //   paymentDetails: {
+        //     paidAmount: Number(updatedPaidAmount),
+        //     dueAmount: Number(updatedDueAmount),
+        //   },
+        // }),
         body: JSON.stringify({
           date: today,
           name,
           quantity: Number(quantity),
           price: Number(value),
-          paymentStatus: payment,
+          // totalAmount,
+          paymentStatus:payment,
           paymentDetails: {
             paidAmount: Number(updatedPaidAmount),
             dueAmount: Number(updatedDueAmount),
           },
+          type,
+          customerId,
+  
         }),
+        credentials: "include",
+
       });
 
       if (response.ok) {
@@ -190,9 +290,16 @@ const Today = () => {
           transition: Slide,
         });
         // Re-fetch sales to include the new entry
-        // const salesResponse = await fetch("http://localhost:4000/sales");
-        // const salesResult = await salesResponse.json();
-        // setAllSales(salesResult.data);
+        const salesResponse = await fetch("http://localhost:4000/sales",{
+          method:"GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          credentials:"include"
+        });
+        const salesResult = await salesResponse.json();
+        setAllSales(salesResult.data);
       } else {
         console.error("Error saving transaction");
       }
@@ -202,10 +309,9 @@ const Today = () => {
   };
 
   // Calculate totals for page summary
-  // Calculate totals for page summary
-  console.log("allSales:", allSales); // Check the value of allSales
+  console.log("allSales:", allSales);
   const totalSales = Array.isArray(allSales)
-    ? allSales.reduce((acc, sale) => acc +sale.amount, 0)
+    ? allSales.reduce((acc, sale) => acc + sale.amount, 0)
     : 0;
   const totalPaid = Array.isArray(allSales)
     ? allSales.reduce((acc, sale) => acc + sale.paymentDetails.paidAmount, 0)
@@ -213,16 +319,17 @@ const Today = () => {
   const totalDue = Array.isArray(allSales)
     ? allSales.reduce((acc, sale) => acc + sale.paymentDetails.dueAmount, 0)
     : 0;
+  const avgPrice = Array.isArray(allSales)
+    ? allSales.reduce((acc, sale) => acc + sale.price, 0)
+    : 0;
 
-  // const filteredSales = allSales.filter((sale) =>
-  //   activeTab === "customer"
-  //     ? sale.name.includes("Customer")
-  //     : sale.name.includes("Supplier")
-  // );
-  const filteredSales = allSales.filter((sale) =>
-    activeTab === "customer"
-      ? sale.type && sale.type.includes("customer")  // Check if sale.type is defined
-      : sale.type && sale.type.includes("supplier")  // Check if sale.type is defined
+  // const AvgPrice = avgPrice / allSales.length;
+  const AvgPrice = avgPrice;
+  const filteredSales = allSales.filter(
+    (sale) =>
+      activeTab === "customer"
+        ? sale.type && sale.type.includes("customer") // Check if sale.type is defined
+        : sale.type && sale.type.includes("supplier") // Check if sale.type is defined
   );
 
   const renderPaymentDetails = () =>
@@ -241,6 +348,7 @@ const Today = () => {
               onChange={(e) => setPaidAmount(e.target.value)}
               fullWidth
               required
+              min="1" max="1000000"
             />
           </Grid>
           <Grid item xs={6}>
@@ -266,7 +374,6 @@ const Today = () => {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
-
         },
         credentials: "include",
       });
@@ -329,7 +436,13 @@ const Today = () => {
                 Name:
               </label>
               <select
-                onChange={(e) => setName(e.target.value)}
+               onChange={(e) => {
+                setName(e.target.value);
+                // Find the selected customer ID based on the selected name
+                const selectedCustomer = customers.find(customer => customer.name === e.target.value);
+                setCustomerId(selectedCustomer ? selectedCustomer._id : "");
+                setType(selectedCustomer ? selectedCustomer.type : "");
+              }}
                 value={name}
                 required
                 className="w-full px-3 py-2 border border-gray-400 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -363,11 +476,14 @@ const Today = () => {
                 Quantity
               </label>
               <input
+                type="number"
                 value={quantity}
                 onChange={(e) => setQuantity(e.target.value)}
                 className="w-full px-3 py-2 border border-gray-400 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Enter quantity"
                 variant="outlined"
+                required
+                min="1" max="10000"
               />
             </div>
           </div>
@@ -384,6 +500,8 @@ const Today = () => {
                 className="w-full px-3 py-2 border border-gray-400 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 variant="outlined"
                 placeholder="Enter value"
+                required
+                 min="1" max="10000"
               />
             </div>
             <div>
@@ -394,8 +512,9 @@ const Today = () => {
                 value={payment}
                 onChange={(e) => setPayment(e.target.value)}
                 className="w-full px-3 py-2 border border-gray-400 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                required
               >
-                <option value="">Select Payment Status</option>
+                <option value="" disabled>Select Payment Status</option>
                 <option value="paid">Paid</option>
                 <option value="partial">Partial</option>
                 <option value="unpaid">Unpaid</option>
@@ -431,20 +550,27 @@ const Today = () => {
         <div className="flex flex-wrap gap-4	mb-4 text-center items-center">
           <div className="info-item">
             <strong>Total Sales:</strong>{" "}
-            {totalDue.toLocaleString("en-IN", {
+            {totalSales.toLocaleString("en-IN", {
               style: "currency",
               currency: "INR",
             })}
           </div>
           <div className="info-item">
-            <strong>Total amount:</strong>{" "}
-            {totalDue.toLocaleString("en-IN", {
+            <strong>Avg price:</strong>{" "}
+            {AvgPrice.toLocaleString("en-IN", {
               style: "currency",
               currency: "INR",
             })}
           </div>
           <div className="info-item">
             <strong className="info">Total paid:</strong>{" "}
+            {totalPaid.toLocaleString("en-IN", {
+              style: "currency",
+              currency: "INR",
+            })}
+          </div>
+          <div className="info-item">
+            <strong>Total Due:</strong>{" "}
             {totalDue.toLocaleString("en-IN", {
               style: "currency",
               currency: "INR",
@@ -481,13 +607,15 @@ const Today = () => {
               </TableRow>
             </TableHead>
             <TableBody>
+              {/* filteredSales here is its check if user adding is customer or supplier and based on that we made filteredSales */}
               {filteredSales.map((sale) => (
+              // {allSales.map((sale) => (
                 <StyledTableRow key={sale._id}>
-                  <StyledTableCell>{sale.customerName}</StyledTableCell>
+                  <StyledTableCell>{sale.name}</StyledTableCell>
                   <StyledTableCell>{sale.quantity}</StyledTableCell>
-                  <StyledTableCell align="right">{sale.value}</StyledTableCell>
+                  <StyledTableCell >{sale.price}</StyledTableCell>
                   <StyledTableCell>
-                    {(sale.quantity * sale.price).toLocaleString("en-IN", {
+                    {(sale.amount).toLocaleString("en-IN", {
                       style: "currency",
                       currency: "INR",
                     })}
@@ -506,8 +634,17 @@ const Today = () => {
                   </StyledTableCell>
                   {/* <StyledTableCell>{sale.date}</StyledTableCell> */}
                   <TableCell align="right">
+                  {/* <button
+                      className="px-2 py-1 rounded-md border-2 border-rose-500 text-red-700"
+                      onClick={() => {
+                        handleDelete(sale._id);
+                      }}
+                    >
+                      Edit
+                    </button> */}
+                    
                     <button
-                      className="text-black px-2 py-1 rounded-md border-2 border-rose-500 text-red-700"
+                      className="px-2 py-1 rounded-md border-2 border-rose-500 text-red-700"
                       onClick={() => {
                         handleDelete(sale._id);
                       }}

@@ -9,8 +9,8 @@ import {
   FaAddressCard,
 } from "react-icons/fa";
 import { FcMoneyTransfer } from "react-icons/fc";
-import jsPDF from "jspdf";
-import html2canvas from "html2canvas";
+// import jsPDF from "jspdf";
+// import html2canvas from "html2canvas";
 import html2pdf from 'html2pdf.js';
 
 
@@ -49,7 +49,7 @@ const Profile = () => {
       }
     };
     fetchCust();
-  }, []);
+  }, [token]);
 
   useEffect(() => {
     if (selectedCustomer) {
@@ -84,7 +84,7 @@ const Profile = () => {
       };
       fetchSalesAndPayments();
     }
-  }, [selectedCustomer]);
+  }, [selectedCustomer,token]);
 
   const handleCustomerClick = (customer) => {
     setSelectedCustomer(customer);

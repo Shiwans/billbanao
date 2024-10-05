@@ -3,8 +3,8 @@ const mongoose = require('mongoose');
 const supplierSchema = new mongoose.Schema({
     userId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'User', // Reference to the User model
-        required: true // Ensure every customer is associated with a user
+        ref: 'User', 
+        required: true 
     },
     name: {
         type: String,
@@ -25,7 +25,6 @@ const supplierSchema = new mongoose.Schema({
         email: {
             type: String,
             required: true,
-            unique: true,
             validate: {
                 validator: function (v) {
                     return /^([\w-.]+@([\w-]+\.)+[\w-]{2,4})?$/.test(v); 
@@ -36,12 +35,6 @@ const supplierSchema = new mongoose.Schema({
         upi: {
             type: String,
             required: true,
-            validate: {
-                validator: function (v) {
-                    return /^[a-zA-Z0-9._]+@[a-zA-Z]{2,10}$/.test(v); // Basic UPI validation
-                },
-                message: props => `${props.value} is not a valid UPI ID!`
-            },
         },
     },
     type: {
@@ -54,8 +47,9 @@ const supplierSchema = new mongoose.Schema({
     },
     totalPaid: {
         type: Number,
-        default: 0, // Total amount paid
-    },
+        default: 0,
+        min: [0, 'Total paid cannot be negative'],
+      },
     totalDue: {
         type: Number,
         default: 0, // Total left to give

@@ -13,12 +13,12 @@ import {
   Paper,
 } from "@mui/material";
 
-const DateQuery = () => {
+const PurchaseQuery = () => {
   const [startDate, setStartDate] = useState("");
   const [name, setName] = useState("");
-  const [salesData, setSalesData] = useState([]);
+  const [purchaseData, setPurchaseData] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
-  const [customerList, setCustomerList] = useState([]);
+  const [supplierList, setSupplierList] = useState([]);
   const [editingRow, setEditingRow] = useState(null); // Track the row being edited
   const [editData, setEditData] = useState({}); // Hold the row data for editing
   // const [paidAmount, setPaidAmount] = useState("");
@@ -26,9 +26,9 @@ const DateQuery = () => {
   const token = localStorage.getItem("token");
 
   useEffect(() => {
-    const fetchCustomers = async () => {
+    const fetchSupplier = async () => {
       try {
-        const response = await fetch("http://localhost:4000/customer", {
+        const response = await fetch("http://localhost:4000/supplier", {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -37,13 +37,13 @@ const DateQuery = () => {
           credentials: "include",
         });
         const result = await response.json();
-        setCustomerList(result.data);
+        setSupplierList(result.data);
       } catch (error) {
-        console.error("unable to fetch customer list", error);
-        setCustomerList([]);
+        console.error("unable to fetch supplier list", error);
+        setSupplierList([]);
       }
     };
-    fetchCustomers();
+    fetchSupplier();
   }, []);
 
   useEffect(() => {
@@ -57,7 +57,7 @@ const DateQuery = () => {
         });
 
         const response = await fetch(
-          `http://localhost:4000/sales/fetch?${queryParams}`,
+          `http://localhost:4000/purchase/fetch?${queryParams}`,
           {
             method: "GET",
             headers: {
@@ -69,7 +69,7 @@ const DateQuery = () => {
         );
         const result = await response.json();
         console.log('response after fetching data',result)
-        setSalesData(result.data);
+        setPurchaseData(result.data);
       } catch (error) {
         console.log("error", error);
       }
@@ -79,30 +79,30 @@ const DateQuery = () => {
   }, [startDate, name]);
 
   useEffect(() => {
-    if (Array.isArray(salesData)) {
-      let filteredList = salesData;
+    if (Array.isArray(purchaseData)) {
+      let filteredList = purchaseData;
   
       // if (name) {
-      //   filteredList = filteredList.filter((sale) => sale.customerName === name);
+      //   filteredList = filteredList.filter((purchase) => purchase.name === name);
       // }
   
       // if (startDate) {
       //   const formattedStartDate = new Date(startDate).toLocaleDateString('en-CA'); // Consistent formatting
       //   filteredList = filteredList.filter(
-      //     (sale) => new Date(sale.date).toLocaleDateString('en-CA') === formattedStartDate
+      //     (purchase) => new Date(purchase.date).toLocaleDateString('en-CA') === formattedStartDate
       //   );
       // }
       console.log('result after filtering',filteredList)
       setFilteredData(filteredList || []);
     } else {
-      console.log("salesData is not an array:", salesData);
+      console.log("purchaseData is not an array:", purchaseData);
       setFilteredData([]);
     }
-  }, [name, startDate, salesData]);
+  }, [name, startDate, purchaseData]);
 
   const handleDelete = async (id) => {
     try {
-      const response = await fetch(`http://localhost:4000/sales/${id}`, {
+      const response = await fetch(`http://localhost:4000/purchase/${id}`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
@@ -111,11 +111,11 @@ const DateQuery = () => {
         credentials: "include",
       });
       if (response.ok) {
-        setSalesData((prevSales) =>
-          prevSales.filter((sale) => sale._id !== id)
+        setPurchaseData((prevPur) =>
+          prevPur.filter((purchase) => purchase._id !== id)
         );
 
-        toast.success("sale deleted successfully!", {
+        toast.success("purchase deleted successfully!", {
           position: "top-right",
           autoClose: 1000,
           hideProgressBar: false,
@@ -127,13 +127,13 @@ const DateQuery = () => {
           transition: Slide,
         });
       } else {
-        toast.error("Error deleting customer!", {
+        toast.error("Error deleting supplier!", {
           position: "top-right",
           autoClose: 1000,
         });
       }
     } catch (error) {
-      toast.error("unable to delete sale!", {
+      toast.error("unable to delete purchase!", {
         position: "top-right",
         autoClose: 1000,
         hideProgressBar: false,
@@ -147,9 +147,9 @@ const DateQuery = () => {
     }
   };
 
-  const handleEdit = (sale) => {
-    setEditingRow(sale._id); // Set the current row to edit
-    setEditData(sale); // Pre-fill the editing form with current row data
+  const handleEdit = (purchase) => {
+    setEditingRow(purchase._id); // Set the current row to edit
+    setEditData(purchase); // Pre-fill the editing form with current row data
   };
 
   const handleCancelEdit = () => {
@@ -174,7 +174,7 @@ const DateQuery = () => {
     // };
     try {
       const response = await fetch(
-        `http://localhost:4000/sales/${editingRow}`,
+        `http://localhost:4000/purchase/${editingRow}`,
         {
           method: "PUT",
           headers: {
@@ -188,26 +188,26 @@ const DateQuery = () => {
       );
 
       if (response.ok) {
-        const updatedSale = await response.json();
-        setSalesData((prevSales) =>
-          prevSales.map((sale) =>
-            sale._id === editingRow ? updatedSale.data : sale
+        const updatedPurchase = await response.json();
+        setPurchaseData((prevPur) =>
+          prevPur.map((purchase) =>
+            purchase._id === editingRow ? updatedPurchase.data : purchase
           )
         );
-        toast.success("Sale updated successfully!", {
+        toast.success("purchase updated successfully!", {
           position: "top-right",
           autoClose: 1000,
           theme: "dark",
         });
         setEditingRow(null); // Exit edit mode
       } else {
-        toast.error("Error updating sale!", {
+        toast.error("Error updating purchase!", {
           position: "top-right",
           autoClose: 1000,
         });
       }
     } catch (error) {
-      toast.error("Unable to update sale!", {
+      toast.error("Unable to update purchase!", {
         position: "top-right",
         autoClose: 1000,
         theme: "dark",
@@ -307,15 +307,15 @@ const DateQuery = () => {
             value={name}
             onChange={(e) => setName(e.target.value)}
           >
-            <option value="">Select Customer</option>
-            {customerList.length > 0 ? (
-              customerList.map((customer) => (
-                <option key={customer._id} value={customer.name}>
-                  {customer.name}
+            <option value="">Select supplier</option>
+            {supplierList.length > 0 ? (
+              supplierList.map((supplier) => (
+                <option key={supplier._id} value={supplier.name}>
+                  {supplier.name}
                 </option>
               ))
             ) : (
-              <option disabled>No customers found</option>
+              <option disabled>No suppliers found</option>
             )}
           </select>
         </div>
@@ -332,7 +332,7 @@ const DateQuery = () => {
           <TableHead>
             <TableRow>
               <TableCell>Date</TableCell>
-              <TableCell>Customer</TableCell>
+              <TableCell>Supplier</TableCell>
               <TableCell>Quantity</TableCell>
               <TableCell>Price (₹)</TableCell>
               <TableCell>Total (₹)</TableCell>
@@ -344,11 +344,11 @@ const DateQuery = () => {
           </TableHead>
           <TableBody>
             {filteredData.length > 0 ? (
-              filteredData.map((sale) =>
-                editingRow === sale._id ? (
-                  <TableRow key={sale._id}>
+              filteredData.map((purchase) =>
+                editingRow === purchase._id ? (
+                  <TableRow key={purchase._id}>
                     <TableCell>{editData.date}</TableCell>
-                    <TableCell>{editData.customerName}</TableCell>
+                    <TableCell>{editData.name}</TableCell>
                     <TableCell>
                       <TextField
                         name="quantity"
@@ -437,29 +437,29 @@ const DateQuery = () => {
                     </TableCell>
                   </TableRow>
                 ) : (
-                  <TableRow key={sale._id}>
-                    <TableCell>{sale.date}</TableCell>
-                    <TableCell>{sale.customerName}</TableCell>
-                    <TableCell>{sale.quantity}</TableCell>
-                    <TableCell>{sale.price}</TableCell>
+                  <TableRow key={purchase._id}>
+                    <TableCell>{purchase.date}</TableCell>
+                    <TableCell>{purchase.name}</TableCell>
+                    <TableCell>{purchase.quantity}</TableCell>
+                    <TableCell>{purchase.price}</TableCell>
                     <TableCell>
-                      {(sale.quantity * sale.price).toLocaleString("en-IN", {
+                      {(purchase.quantity * purchase.price).toLocaleString("en-IN", {
                         maximumFractionDigits: 2,
                         style: "currency",
                         currency: "INR",
                       })}
                     </TableCell>
-                    <TableCell>{sale.paymentStatus}</TableCell>
-                    <TableCell>{sale.paymentDetails.paidAmount}</TableCell>
+                    <TableCell>{purchase.paymentStatus}</TableCell>
+                    <TableCell>{purchase.paymentDetails.paidAmount}</TableCell>
                     <TableCell>
-                      {sale.paymentDetails?.dueAmount ?? ""}
+                      {purchase.paymentDetails?.dueAmount ?? ""}
                     </TableCell>
                     <TableCell className="flex text-center p-2">
                       <Button
                         variant="outlined"
                         size="small"
                         className="p-0.5 w-2"
-                        onClick={() => handleEdit(sale)}
+                        onClick={() => handleEdit(purchase)}
                         color="primary"
                       >
                         Edit
@@ -470,7 +470,7 @@ const DateQuery = () => {
                         color="error"
                         className="p-0.5 w-2 mt-1"
                         sx={{ ml: 1 }}
-                        onClick={() => handleDelete(sale._id)}
+                        onClick={() => handleDelete(purchase._id)}
                       >
                         Delete
                       </Button>
@@ -492,4 +492,4 @@ const DateQuery = () => {
   );
 };
 
-export default DateQuery;
+export default PurchaseQuery;

@@ -6,20 +6,22 @@ const userSchema = new mongoose.Schema({
   name: {
     type: String,
     required: true,
-    unique: true, // Ensure username is unique
-    trim: true, // Remove whitespace
+    unique: true,
+    trim: true,
   },
   email: {
     type: String,
     required: true,
-    unique: true, // Ensure email is unique
-    lowercase: true, // Convert to lowercase for uniformity
-    trim: true, // Remove whitespace
+    unique: true,
+    lowercase: true,
+    trim: true,
   },
   password: {
     type: String,
     required: true,
   },
+  //sale, sale's count, you'll get
+  //you'll give,purchase,Customer/supplier count
 });
 
 // Secure the password with bcrypt
@@ -54,7 +56,7 @@ userSchema.methods.generateToken = function() {
   const user = this;
   try {
     const token = jwt.sign({ id: user._id, email: user.email }, process.env.JWT_SECRET_KEY, {
-      expiresIn: '1h', // Adjust this based on your app needs
+      expiresIn: '11h', // Adjust this based on your app needs
     });
     return token;
   } catch (error) {

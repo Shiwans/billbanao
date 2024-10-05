@@ -63,7 +63,7 @@ const Customer = () => {
       }
     };
     fetchCust();
-  }, []);
+  }, [token]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -72,8 +72,9 @@ const Customer = () => {
         ? `http://localhost:4000/customer/${editingCustomerId}`
         : "http://localhost:4000/customer";
       const method = editingCustomerId ? "PUT" : "POST";
-
-      await fetch(url, {
+  
+      // Fetch request
+      const response = await fetch(url, {
         method,
         headers: {
           "Content-Type": "application/json",
@@ -93,37 +94,53 @@ const Customer = () => {
         }),
         credentials: "include",
       });
-
-      toast.success(
-        editingCustomerId
-          ? "Customer has been updated!"
-          : "Customer has been added!",
-        {
+  
+      // Debugging response details
+      const data = await response.json();
+      console.log("Response Status:", response.status);
+      console.log("Response Data:", data);
+  
+      // Check response status
+      if (response.ok) {
+        toast.success(
+          editingCustomerId
+            ? "Customer has been updated!"
+            : "Customer has been added!",
+          {
+            position: "top-right",
+            autoClose: 1000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "dark",
+            transition: Slide,
+          }
+        );
+        
+        resetForm(); // Reset the form after successful submission
+  
+        // Fetch customers again after successful save
+        const fetchResponse = await fetch("http://localhost:4000/customer", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          credentials: "include",
+        });
+        const fetchData = await fetchResponse.json();
+        setCustomer(fetchData.data);
+      } else {
+        // Show error message with response data
+        toast.error(`Error saving customer! ${data.message || 'Please try again.'}`, {
           position: "top-right",
           autoClose: 1000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "dark",
-          transition: Slide,
-        }
-      );
-
-      resetForm();
-      const response = await fetch("http://localhost:4000/customer", {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        credentials: "include",
-      });
-      const data = await response.json();
-      setCustomer(data.data);
+        });
+      }
     } catch (error) {
-      console.error(error);
+      console.error("Error occurred while saving customer:", error);
       toast.error("Unable to save customer!", {
         position: "top-right",
         autoClose: 1000,
@@ -137,6 +154,8 @@ const Customer = () => {
       });
     }
   };
+  
+  
 
   const handleEdit = (customer) => {
     setEditingCustomerId(customer._id);
@@ -231,15 +250,16 @@ const Customer = () => {
             <Grid item xs={12} sm={6}>
               <TextField
                 required
+                type="number"
                 id="phone"
                 name="phone"
                 label="Phone"
                 fullWidth
                 variant="outlined"
                 value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                type="tel"
-                inputProps={{ minLength: 10, maxLength: 10 }}
+                onChange={(e) => setPhone(e.target.value)} 
+                error={phone.length !== 10 && phone.length > 0} // Show error if not exactly 10 digits
+                helperText={phone.length !== 10 && phone.length > 0 ? "Phone number must be exactly 10 digits." : ""}
               />
             </Grid>
             <Grid item xs={12} sm={6}>
@@ -276,7 +296,6 @@ const Customer = () => {
                 type="number"
                 variant="outlined"
                 onChange={(e) => setTotalAmount(e.target.value)}
-                InputProps={{ inputProps: { min: 0, step: 0.01 } }}
               />
             </Grid>
             {/* id="totalDue" */}
@@ -289,7 +308,6 @@ const Customer = () => {
                 value={totalPaid}
                 onChange={(e) => setTotalPaid(e.target.value)}
                 type="number"
-                InputProps={{ inputProps: { min: 0, step: 0.01 } }}
               />
             </Grid>
             <Grid item xs={12}>

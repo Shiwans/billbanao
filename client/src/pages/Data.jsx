@@ -23,7 +23,6 @@ const Reports = () => {
   const [customerList, setCustomerList] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
   const token = localStorage.getItem("token");
-  const doc = new jsPDF();
 
   const handleClick = async () => {
     const doc = new jsPDF();
@@ -53,18 +52,35 @@ const Reports = () => {
       }
     };
     fetchCustomers();
-  }, []);
+  }, [token]);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        if (startDate) {
-          const formattedStartDate = startDate
-            ? new Date(startDate).toISOString().split("T")[0]
-            : "";
-          const formattedEndDate = endDate
-            ? new Date(endDate).toISOString().split("T")[0]
-            : "";
+        if (!startDate || !endDate) {
+          toast.info("Select options!", {
+            position: "top-right",
+            autoClose: 1000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "light",
+            transition: Slide,
+          });
+        }
+        const formattedStartDate = startDate
+          ? new Date(startDate).toISOString().split("T")[0]
+          : "";
+        const formattedEndDate = endDate
+          ? new Date(endDate).toISOString().split("T")[0]
+          : "";
+        if(startDate && endDate){
+          if (new Date(startDate) > new Date(endDate)) {
+            toast.error("Start date cannot be later than end date!");
+            return;
+          }
           const queryParams = new URLSearchParams({
             startDate: formattedStartDate,
             endDate: formattedEndDate,
@@ -81,20 +97,8 @@ const Reports = () => {
             }
           );
           const data = await response.json();
-
-          setSalesData(data);
-        } else {
-          toast.info("Select options!", {
-            position: "top-right",
-            autoClose: 1000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-            theme: "light",
-            transition: Slide,
-          });
+          console.log("this is going to be stored in sales data", data);
+          setSalesData(data.data);
         }
       } catch (error) {
         console.log("error", error);
@@ -102,22 +106,23 @@ const Reports = () => {
     };
 
     fetchData();
-  }, [startDate, endDate]);
+  }, [startDate, endDate, token]);
 
   useEffect(() => {
-    // Apply customer name filter if name is selected
-    if (name) {
-      const filteredList = salesData.filter(
-        (sale) => sale.customerName === name
-      );
-      setFilteredData(filteredList || []);
-    } else {
-      setFilteredData(salesData || []);
+    console.log("Current name for filtering:", name); // Log the name being filtered
+    console.log("Current sales data:", salesData); 
+    if (!name) {
+      setFilteredData(salesData);
+      return;
     }
+  
+    // Filter sales data based on selected customer name
+    const filteredList = salesData.filter(sale => sale.name === name);
+    console.log("Filtered data:", filteredList); // Log the filtered data
+    setFilteredData(filteredList);
   }, [name, salesData]);
-
   useEffect(() => {
-    // Calculate totals after filtering
+    // if (!Array.isArray(filteredData)) return;
     const totalSold = filteredData.reduce(
       (acc, item) => acc + (item.amount || 0),
       0
@@ -134,11 +139,11 @@ const Reports = () => {
       (acc, item) => acc + (item.purchaseAmount || 0), // Assuming purchaseAmount exists
       0
     );
-  
+
     const averagePrice = totalQuantity > 0 ? totalSold / totalQuantity : 0;
     const totalDue = totalSold - totalPaid;
     const profitOrLoss = totalSold - totalPurchase;
-  
+
     setTotalAmount(totalSold);
     setTotalJama(totalPaid);
     setAveragePrice(averagePrice);
@@ -213,6 +218,7 @@ const Reports = () => {
               className=" px-2 py-1 border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               onChange={(e) => {
                 setName(e.target.value);
+                console.log("Selected customer name:", e.target.value);
               }}
             >
               <option value="">Select Customer</option>
@@ -267,11 +273,12 @@ const Reports = () => {
               </tr>
             </thead>
             <tbody>
+              {console.log("Sales data before showing on screen,", salesData)}
               {filteredData.length > 0 ? (
-                filteredData.map((item) => (
+                 filteredData.map((item) => (
                   <tr key={item.id}>
                     <td>{new Date(item.date).toLocaleDateString("en-GB")}</td>
-                    <td>{item.customerName}</td>
+                    <td>{item.name}</td>
                     <td>{item.quantity}</td>
                     <td>{item.price}</td>
                     <td>

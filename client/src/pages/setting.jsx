@@ -2,8 +2,6 @@ import React, { useEffect, useState } from 'react';
 
 const Settings = () => {
     const [userData, setUserData] = useState(null);
-    const token = localStorage.getItem("token");
-
     useEffect(() => {
         const token = localStorage.getItem('token');
         
@@ -15,20 +13,9 @@ const Settings = () => {
                     'Authorization': `Bearer ${token}`,
                 }
             })
-            .then(response => {
-                if (response.ok) {
-                    return response.json();
-                }
-                throw new Error('Failed to fetch user data');
-            })
             .then(data => {
                 setUserData(data);
             })
-            .catch(error => {
-                console.error('Error:', error);
-                // Optionally redirect to login if token is invalid
-                window.location.href = 'http://localhost:3000/login'; // Adjust as needed
-            });
         } else {
             window.location.href = 'http://localhost:3000/login'; // No token, redirect
         }
@@ -40,6 +27,8 @@ const Settings = () => {
             {userData ? (
                 <div>
                     <p>Name: {userData.name}</p>
+                    {/* <p>Name: {req.user.id}</p> */}
+                    {/* <p>Email: {req.user.email}</p> */}
                     <p>Email: {userData.email}</p>
                     {/* Display other user info as needed */}
                 </div>

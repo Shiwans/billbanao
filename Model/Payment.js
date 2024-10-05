@@ -35,8 +35,12 @@ const paymentSchema = new mongoose.Schema({
     paymentDate: {
         type: String,
         default: () => new Date().toISOString().split('T')[0], //YYYY-MM-DD
+    },paymentType: {
+        type: String,
+        enum: ['received', 'paid'],
+        required: true, // Ensure this field is required
     },
-});
+}, { timestamps: true });
 
 paymentSchema.pre('save', function(next) {
     if (this.paymentDate) {

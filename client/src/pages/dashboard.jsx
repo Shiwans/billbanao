@@ -1,62 +1,100 @@
 import React, { useEffect, useState } from "react";
-import "./dashboard.css"; // Import custom CSS for styling
+import "./dashboard.css"; 
+import { useNavigate } from "react-router-dom";
 
 const Dashboard = () => {
   const [data, setData] = useState({
-    salesAmount: 50000,
-    salesCount: 49,
-    purchaseAmount: 30000,
-    userCount: 10,
-    receivableAmount: 10000,
+    salesAmount: 0,
+    purchaseAmount: 0,
+    totalKg: 0,
+    custCount: 0,
+    receivableAmount: 0,
+    payableAmount: 0,
   });
+
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   const token = localStorage.getItem("token");
 
   useEffect(() => {
-    // const fetchData = async () => {
-    //   try {
-    //     const response = await fetch("/api/sales/september", {
-    //       headers: {
-    //         // 'Authorization': `Bearer ${localStorage.getItem('token')}`,
-    //       }
-    //     });
+    if (!token) {
+      console.error("Authentication token missing");
+      navigate("/login"); 
+      return;
+    }
 
-    //     if (!response.ok) throw new Error('Failed to fetch data');
+    const fetchData = async () => {
+      try {
+        const response = await fetch("http://localhost:4000/dashboard", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
 
-    //     const result = await response.json();
-    //     setData(result);
-    //   } catch (error) {
-    //     console.error("Error fetching data:", error);
-    //   }
-    // };
+        if (!response.ok) {
+          throw new Error("Failed to fetch data");
+        }
 
-    // fetchData();
-  }, []);
+        const result = await response.json();
+        console.log(result); // Debugging purposes, log the result from backend
+        setData({
+          salesAmount: result.salesAmount,
+          purchaseAmount: result.purchaseAmount,
+          totalKg: result.totalKg,
+          custCount: result.custCount,
+          receivableAmount: result.receivableAmount,
+          payableAmount: result.payableAmount,
+        });
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [token, navigate]);
+
+  if (loading) {
+    return <div>Loading...</div>; 
+  }
+
   return (
     <div className="dashboard">
       <div className="row">
-        {/* Sale Section */}
         <div className="card">
           <div className="card-content">
-            <h3 className="card-title">Sale</h3>
-            <p className="amount">{data.salesAmount.toLocaleString('en-IN',{maximumFractionDigits: 2,style: 'currency',currency: 'INR'})}</p>
-            <p className="description">Total Sale (Sep)</p>
-            {/* <p className="growth">0% This Month Growth</p> */}
+            <h3 className="card-title">Total Sales</h3>
+            <p className="count text-2xl	">
+              {data.salesAmount.toLocaleString("en-IN", {
+                maximumFractionDigits: 2,
+                style: "currency",
+                currency: "INR",
+              })}
+            </p>
+            <p className="description">Total Sale Amount (Till Now)</p>
           </div>
         </div>
 
         <div className="card">
           <div className="card-content">
-            <h3 className="card-title">Sale's Count</h3>
-            <p className="count">{data.salesCount} Sales</p>
+            <h3 className="card-title">Customer Count</h3>
+            <p className="count text-2xl	">{data.custCount} Customers</p>
           </div>
         </div>
-        
+
         <div className="card">
           <div className="card-content">
-            <h3 className="card-title">You'll Get</h3>
-            <p className="amount">{data.receivableAmount.toLocaleString('en-IN',{maximumFractionDigits: 2,style: 'currency',currency: 'INR'})}</p>
-            <p className="description">Shiwans Vaishya</p>
+            <h3 className="card-title">Receivable Amount</h3>
+            <p className="amount text-2xl	">
+              {data.receivableAmount.toLocaleString("en-IN", {
+                maximumFractionDigits: 2,
+                style: "currency",
+                currency: "INR",
+              })}
+            </p>
+            <p className="description">Total Amount You Will Receive</p>
           </div>
         </div>
       </div>
@@ -64,24 +102,36 @@ const Dashboard = () => {
       <div className="row">
         <div className="card">
           <div className="card-content">
-            <h3 className="card-title">Purchase</h3>
-            <p className="amount">{data.purchaseAmount.toLocaleString('en-IN',{maximumFractionDigits: 2,style: 'currency',currency: 'INR'})}</p>
-            <p className="description">This Month</p>
+            <h3 className="card-title">Total Purchases</h3>
+            <p className="count text-2xl	">
+              {data.purchaseAmount.toLocaleString("en-IN", {
+                maximumFractionDigits: 2,
+                style: "currency",
+                currency: "INR",
+              })}
+            </p>
+            <p className="description">Total Purchase Amount</p>
           </div>
         </div>
-        
+
         <div className="card">
           <div className="card-content">
-            <h3 className="card-title">User Count</h3>
-            <p className="count">{data.userCount} Users</p>
+            <h3 className="card-title">Total Kg</h3>
+            <p className="count text-2xl	">{data.totalKg} Kg Sold</p>
           </div>
         </div>
-        
+
         <div className="card">
           <div className="card-content">
-            <h3 className="card-title">You'll Receive</h3>
-            <p className="amount">{data.receivableAmount.toLocaleString('en-IN',{maximumFractionDigits: 2,style: 'currency',currency: 'INR'})}</p>
-            <p className="description">Shiwans Vaishya</p>
+            <h3 className="card-title">Payable Amount</h3>
+            <p className="amount text-red-600	text-2xl		">
+              {data.payableAmount.toLocaleString("en-IN", {
+                maximumFractionDigits: 2,
+                style: "currency",
+                currency: "INR",
+              })}
+            </p>
+            <p className="description">Total Payable Amount</p>
           </div>
         </div>
       </div>

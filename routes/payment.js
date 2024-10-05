@@ -14,4 +14,7 @@ router.get('/fetch',paymentC.fetchNameDate)
 //GET /payment/10    fetch 10 recent payments
 router.get('/10',paymentC.fetch10)
 
+router.get('/pay',paymentC.fetchCustomer)
+
+
 module.exports = router;

@@ -1,4 +1,6 @@
 const Customer = require('../Model/Customer');
+const Sale = require('../Model/Sale')
+const Payment= require('../Model/Payment')
 
 const fetchData = async (req, res) => {
     try {

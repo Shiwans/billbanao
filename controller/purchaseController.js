@@ -1,10 +1,11 @@
-const Sale = require('../Model/Sale');
+//purchase controller
+const Purchase = require('../Model/Purchase');
 const Customer = require('../Model/Customer');
 
 const fetchData = async (req, res) => {
     try {
-        const data = await Sale.find({ userId: req.user.id }).sort({ createdAt: -1 })
-        res.status(200).json({ message: 'Sales fetched successfully', data });
+        const data = await Purchase.find({ userId: req.user.id }).sort({ createdAt: -1 })
+        res.status(200).json({ message: 'Purchase fetched successfully', data });
     } catch (error) {
         res.status(500).json({ message: 'Error while fetching data', error });
     }
@@ -12,10 +13,10 @@ const fetchData = async (req, res) => {
 
 const postData = async (req, res) => {
     try {
-        const { date, name, quantity, price, paymentStatus, paymentDetails, type,customerId } = req.body;
+        const { date, name, quantity, price, paymentStatus, paymentDetails, type,supplierId } = req.body;
         const amount = quantity * price;
 
-        const newSale = new Sale({
+        const newPurchase = new Purchase({
             date,
             name,
             quantity,
@@ -25,10 +26,10 @@ const postData = async (req, res) => {
             paymentDetails,
             type,
             userId: req.user.id,
-            customerId
+            supplierId
         });
 
-        await newSale.save();
+        await newPurchase.save();
 
         const due = amount - (paymentDetails.paidAmount || 0);
         await Customer.findOneAndUpdate(
@@ -42,35 +43,34 @@ const postData = async (req, res) => {
             }
         );
 
-        res.status(200).json({ message: 'Sale saved successfully', sale: newSale });
+        res.status(200).json({ message: 'Purchase saved successfully', Purchase: newPurchase });
     } catch (error) {
-        console.error('Error saving sale:', error);
-        res.status(500).json({ message: 'Error saving sale', error });
+        console.error('Error saving Purchase:', error);
+        res.status(500).json({ message: 'Error saving Purchase', error });
     }
 };
 
-const updateSale = async (req, res) => {
+const updatePurchase = async (req, res) => {
     const { id } = req.params;
     const updatedData = req.body;
 
     try {
-        // Find the sale by ID and update it with new data
-        const sale = await Sale.findByIdAndUpdate(
+        const purchase = await Purchase.findByIdAndUpdate(
             { _id: id, userId: req.user.id },
             updatedData,
             { new: true, runValidators: true }
         );
 
-        if (!sale) {
-            return res.status(404).json({ message: 'Sale not found' });
+        if (!purchase) {
+            return res.status(404).json({ message: 'Purchase not found' });
         }
 
         return res.status(200).json({
-            message: 'Sale updated successfully',
-            data: sale,
+            message: 'Purchase updated successfully',
+            data: purchase,
         });
     } catch (error) {
-        console.error('Error updating sale:', error);
+        console.error('Error updating Purchase:', error);
         return res.status(500).json({ message: 'Server error', error: error.message });
     }
 };
@@ -93,9 +93,9 @@ const fetchQuery = async (req, res) => {
               };
         }
 
-        const sales = await Sale.find(query);
+        const purchases = await Purchase.find(query);
 
-        res.status(200).json({ message: 'Queried data fetched successfully', data: sales });
+        res.status(200).json({ message: 'Queried data fetched successfully', data: purchases });
     } catch (error) {
         console.error('Error fetching queried data:', error);
         res.status(500).json({ message: 'Error fetching queried data', error });
@@ -118,11 +118,11 @@ const fetchDay = async (req, res) => {
             }
         };
 
-        const sales = await Sale.find(query);
-        res.status(200).json({ message: 'Sales fetched successfully', data: sales });
+        const purchases = await Purchase.find(query);
+        res.status(200).json({ message: 'Purchases fetched successfully', data: purchases });
     } catch (error) {
-        console.error('Error fetching sales by day:', error);
-        res.status(500).json({ message: 'Error fetching sales by day', error });
+        console.error('Error fetching Purchases by day:', error);
+        res.status(500).json({ message: 'Error fetching Purchases by day', error });
     }
 };
 
@@ -137,20 +137,20 @@ const fetchNameDate = async (req, res) => {
         }
         const formattedDate = new Date(date).toISOString().split('T')[0];
 
-        const sales = await Sale.find({
+        const purchases = await Purchase.find({
             name: name,
             date: formattedDate, // Ensuring date is correctly formatted
             userId: req.user.id,
         });
 
-        if (sales.length === 0) {
-            return res.status(404).json({ message: 'No sales found for this customer on the given date' });
+        if (purchases.length === 0) {
+            return res.status(404).json({ message: 'No purchases found for this customer on the given date' });
         }
 
-        res.status(200).json({ message: 'Sales for customer on specific date fetched successfully', data: sales });
+        res.status(200).json({ message: 'Purchases for customer on specific date fetched successfully', data: purchases });
     } catch (error) {
-        console.error('Error fetching customer sales by date:', error);
-        res.status(500).json({ message: 'Error fetching customer sales by date', error });
+        console.error('Error fetching customer purchases by date:', error);
+        res.status(500).json({ message: 'Error fetching customer purchases by date', error });
     }
 };
 
@@ -162,37 +162,37 @@ const fetchCustomer = async (req, res) => {
             return res.status(400).json({ message: 'Customer name query parameter is required' });
         }
 
-        const sales = await Sale.find({ name, userId: req.user.id });
-        res.status(200).json({ message: 'Sales for customer fetched successfully', data: sales });
+        const purchases = await Purchase.find({ name, userId: req.user.id });
+        res.status(200).json({ message: 'Purchases for customer fetched successfully', data: purchases });
     } catch (error) {
-        console.error('Error fetching customer sales:', error);
-        res.status(500).json({ message: 'Error fetching customer sales', error });
+        console.error('Error fetching customer purchases:', error);
+        res.status(500).json({ message: 'Error fetching customer purchases', error });
     }
 };
 
-const deleteSale = async (req, res) => {
+const deletePurchase = async (req, res) => {
     try {
-        const sale = await Sale.findById({ _id: req.params.id, userId: req.user.id });
+        const purchase = await Purchase.findById({ _id: req.params.id, userId: req.user.id });
 
-        if (!sale) {
-            return res.status(404).json({ message: 'Sale not found' });
+        if (!purchase) {
+            return res.status(404).json({ message: 'Purchase not found' });
         }
 
-        await Sale.findByIdAndDelete(req.params.id);
-        res.status(200).json({ message: 'Sale has been deleted' });
+        await Purchase.findByIdAndDelete(req.params.id);
+        res.status(200).json({ message: 'Purchase has been deleted' });
     } catch (error) {
-        console.error('Error deleting sale:', error);
-        return res.status(500).json({ message: 'Error deleting sale', error });
+        console.error('Error deleting Purchase:', error);
+        return res.status(500).json({ message: 'Error deleting Purchase', error });
     }
 };
 
-const fetch10Sale = async (req, res) => {
+const fetch10Purchase = async (req, res) => {
     try {
-        const sales = await Sale.find({ userId: req.user.id }).sort({ createdAt: -1 }).limit(10);
-        res.status(200).json({ message: 'Last 10 sales fetched successfully', data: sales });
+        const purchases = await Purchase.find({ userId: req.user.id }).sort({ createdAt: -1 }).limit(10);
+        res.status(200).json({ message: 'Last 10 Purchase fetched successfully', data: purchases });
     } catch (error) {
-        console.error('Error fetching last 10 sales:', error);
-        res.status(500).json({ message: 'Error fetching last 10 sales', error });
+        console.error('Error fetching last 10 purchases:', error);
+        res.status(500).json({ message: 'Error fetching last 10 Purchases', error });
     }
 };
 
@@ -202,8 +202,8 @@ module.exports = {
     fetchQuery,
     fetchDay,
     fetchCustomer,
-    deleteSale,
-    fetch10Sale,
+    deletePurchase,
+    fetch10Purchase,
     fetchNameDate,
-    updateSale,
+    updatePurchase,
 };

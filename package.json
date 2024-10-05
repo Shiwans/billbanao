@@ -15,14 +15,11 @@
   "license": "ISC",
   "dependencies": {
     "@mui/material": "^6.1.0",
-    "bcrypt": "^5.1.1",
     "bcryptjs": "^2.4.3",
-    "connect-mongo": "^5.1.0",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.21.0",
-    "express-session": "^1.18.0",
     "express-validator": "^7.2.0",
     "jsonwebtoken": "^9.0.2",
     "jspdf": "^2.5.2",
@@ -31,8 +28,6 @@
     "mongoose": "^8.6.3",
     "morgan": "^1.10.0",
     "nodemon": "^3.1.4",
-    "passport": "^0.7.0",
-    "passport-google-oauth20": "^2.0.0",
-    "react-native-share": "^11.0.3"
+    "passport-google-oauth20": "^2.0.0"
   }
 }

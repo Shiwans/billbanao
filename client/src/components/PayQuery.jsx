@@ -22,6 +22,7 @@ const PayQuery = () => {
   const [editingRow, setEditingRow] = useState(null); // Track the row being edited
   const [editData, setEditData] = useState({}); // Hold the row data for editing
   // const [paidAmount, setPaidAmount] = useState("");
+  const token = localStorage.getItem("token");
 
   useEffect(() => {
     const fetchCustomers = async () => {
@@ -31,6 +32,7 @@ const PayQuery = () => {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
           },
           credentials: "include",
         });
@@ -39,6 +41,7 @@ const PayQuery = () => {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
           },
           credentials: "include",
         });
@@ -61,25 +64,23 @@ const PayQuery = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const formattedStartDate = startDate
-          ? new Date(startDate).toLocaleDateString("en-CA")//YYYY-MM-DD
+        const formattedStartDate = paymentDate
+          ? new Date(paymentDate).toLocaleDateString("en-CA")//YYYY-MM-DD
           : "";
 
         const queryParams = new URLSearchParams({
-          payerDate: formattedStartDate,
+          paymentDate: formattedStartDate,
           payerName: name,
         });
 
-        const response = await fetch(
-          `http://localhost:4000/payment/fetch?${queryParams}`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            credentials: "include",
-          }
-        );
+        const response = await fetch(`http://localhost:4000/payment/fetch?${queryParams}`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          credentials: "include",
+        });
         const result = await response.json();
         setPayData(result.data);
       } catch (error) {
@@ -113,6 +114,7 @@ const PayQuery = () => {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
         credentials: "include",
       });
@@ -171,6 +173,7 @@ const PayQuery = () => {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
           },
           credentials: "include",
           body: JSON.stringify(editData),

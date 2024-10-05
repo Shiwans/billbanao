@@ -34,7 +34,9 @@ app.use("/customer",authenticateToken,require("./routes/customer"));
 app.use("/payment", authenticateToken,require("./routes/payment"));
 app.use("/supplier",authenticateToken, require("./routes/supplier"));
 app.use("/sales",authenticateToken, require("./routes/sales"));
+app.use("/purchase",authenticateToken, require("./routes/purchase"));
 app.use("/api", require("./routes/auth"));
+app.use("/", require("./routes/dashboard"));
 
 const PORT = process.env.PORT || 4500;
 app.listen(PORT, () => console.log(`Server is running on http://localhost:${PORT}`));

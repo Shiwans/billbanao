@@ -11,10 +11,9 @@ const saleController = require('../controller/saleController')
 //route:-  POST /sales
 router.post('/',saleController.postData)
 
-//description:-   add a sale
-//route:-  POST /sales
+//description:-   update a sale
+//route:-  POST /sales/:id
 router.put('/:id',saleController.updateSale)
-
 
 //description:- query from start to end date
 //route:- GET /sales
