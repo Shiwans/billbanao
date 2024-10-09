@@ -6,7 +6,7 @@ const Settings = () => {
         const token = localStorage.getItem('token');
         
         if (token) {
-            fetch('http://localhost:4000/user', {
+            fetch(`${process.env.REACT_APP_BACKEND_URL}/user`, {
                 method: 'GET',
                 headers: {
                     "Content-Type":"application/json",
@@ -17,7 +17,7 @@ const Settings = () => {
                 setUserData(data);
             })
         } else {
-            window.location.href = 'http://localhost:3000/login'; // No token, redirect
+            window.location.href = `${process.env.REACT_APP_BACKEND_URL}/login`; // No token, redirect
         }
     }, []);
 

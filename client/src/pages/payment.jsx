@@ -82,7 +82,7 @@ const Payment = () => {
     const fetchCustomers = async () => {
       try {
         const [customerResponse, supplierResponse] = await Promise.all([
-          fetch("http://localhost:4000/customer", {
+          fetch(`${process.env.REACT_APP_BACKEND_URL}/customer`, {
             method: "GET",
             headers: {
               "Content-Type": "application/json",
@@ -90,7 +90,7 @@ const Payment = () => {
             },
             credentials: "include",
           }),
-          fetch("http://localhost:4000/supplier", {
+          fetch(`${process.env.REACT_APP_BACKEND_URL}/supplier`, {
             method: "GET",
             headers: {
               "Content-Type": "application/json",
@@ -147,7 +147,7 @@ const Payment = () => {
   // }, [showPopup,token])
   const fetch10Pay = useCallback(async () => {
     try {
-      const response = await fetch("http://localhost:4000/payment/10", {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/payment/10`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -199,7 +199,7 @@ const Payment = () => {
   const updateSupplierDueAmount = async (supplierId, amount) => {
   // const updateSupplierDueAmount = async () => {
     try {
-      const response = await fetch(`http://localhost:4000/supplier/payment`, {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/supplier/payment`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -240,7 +240,7 @@ const Payment = () => {
   const updateCustomerDueAmount = async (customerId, amount) => {
     // const updateSupplierDueAmount = async () => {
       try {
-        const response = await fetch(`http://localhost:4000/customer/payment`, {
+        const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/customer/payment`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -281,7 +281,7 @@ const Payment = () => {
     e.preventDefault();
 
     try {
-      const response = await fetch("http://localhost:4000/payment", {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/payment`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

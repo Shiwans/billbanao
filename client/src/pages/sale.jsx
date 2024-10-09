@@ -80,7 +80,7 @@ const [priceError, setPriceError] = useState("");
   const token = localStorage.getItem("token");
   const fetchSales = useCallback(async () => {
     try {
-      const response = await fetch("http://localhost:4000/sales/10", {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/sales/10`, {
         method: "GET",
         headers: {
           // "Content-Type": "application/json",
@@ -99,7 +99,7 @@ const [priceError, setPriceError] = useState("");
   useEffect(() => {
     const fetchCustomers = async () => {
       try {
-        const response = await fetch("http://localhost:4000/customer", {
+        const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/customer`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -147,7 +147,7 @@ const [priceError, setPriceError] = useState("");
       updatedDueAmount = total;
     }
     console.log('customerType is:',type ,'customerid is: ',customerId)
-    const response = await fetch("http://localhost:4000/sales", {
+    const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/sales`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

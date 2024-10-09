@@ -28,7 +28,7 @@ const PurchaseQuery = () => {
   useEffect(() => {
     const fetchSupplier = async () => {
       try {
-        const response = await fetch("http://localhost:4000/supplier", {
+        const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/supplier`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -57,7 +57,7 @@ const PurchaseQuery = () => {
         });
 
         const response = await fetch(
-          `http://localhost:4000/purchase/fetch?${queryParams}`,
+          `${process.env.REACT_APP_BACKEND_URL}/purchase/fetch?${queryParams}`,
           {
             method: "GET",
             headers: {
@@ -102,7 +102,7 @@ const PurchaseQuery = () => {
 
   const handleDelete = async (id) => {
     try {
-      const response = await fetch(`http://localhost:4000/purchase/${id}`, {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/purchase/${id}`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
@@ -174,7 +174,7 @@ const PurchaseQuery = () => {
     // };
     try {
       const response = await fetch(
-        `http://localhost:4000/purchase/${editingRow}`,
+        `${process.env.REACT_APP_BACKEND_URL}/purchase/${editingRow}`,
         {
           method: "PUT",
           headers: {

@@ -91,7 +91,7 @@ const [type,setType] = useState("")
   useEffect(() => {
     const fetchSales = async () => {
       try {
-        const salesResponse = await fetch("http://localhost:4000/sales", {
+        const salesResponse = await fetch(`${process.env.REACT_APP_BACKEND_URL}/sales`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -117,7 +117,7 @@ const [type,setType] = useState("")
   //         end: today + 1,
   //       };
   //       const response = await fetch(
-  //         `http://localhost:4000/sales/day?${query}`,
+  //         `${process.env.REACT_APP_BACKEND_URL}/sales/day?${query}`,
   //         {
   //           method: "GET",
   //           headers: {
@@ -156,7 +156,7 @@ const [type,setType] = useState("")
         });
   
         const response = await fetch(
-          `http://localhost:4000/sales/day?${query.toString()}`,
+          `${process.env.REACT_APP_BACKEND_URL}/sales/day?${query.toString()}`,
           {
             method: "GET",
             headers: {
@@ -187,14 +187,14 @@ const [type,setType] = useState("")
   useEffect(() => {
     const fetchCustomersAndSuppliers = async () => {
       try {
-        const customerResponse = await fetch("http://localhost:4000/customer", {
+        const customerResponse = await fetch(`${process.env.REACT_APP_BACKEND_URL}/customer`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
             'Authorization': `Bearer ${token}`
           },
         });
-        const supplierResponse = await fetch("http://localhost:4000/supplier", {
+        const supplierResponse = await fetch(`${process.env.REACT_APP_BACKEND_URL}/supplier`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -241,7 +241,7 @@ const [type,setType] = useState("")
     }
 
     try {
-      const response = await fetch("http://localhost:4000/sales", {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/sales`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -290,7 +290,7 @@ const [type,setType] = useState("")
           transition: Slide,
         });
         // Re-fetch sales to include the new entry
-        const salesResponse = await fetch("http://localhost:4000/sales",{
+        const salesResponse = await fetch(`${process.env.REACT_APP_BACKEND_URL}/sales`,{
           method:"GET",
           headers: {
             "Content-Type": "application/json",
@@ -369,7 +369,7 @@ const [type,setType] = useState("")
 
   const handleDelete = async (id) => {
     try {
-      const response = await fetch(`http://localhost:4000/sales/${id}`, {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/sales/${id}`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",

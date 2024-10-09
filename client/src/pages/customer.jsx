@@ -37,7 +37,7 @@ const Customer = () => {
   useEffect(() => {
     const fetchCust = async () => {
       try {
-        const response = await fetch("http://localhost:4000/customer", {
+        const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/customer`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -69,8 +69,8 @@ const Customer = () => {
     e.preventDefault();
     try {
       const url = editingCustomerId
-        ? `http://localhost:4000/customer/${editingCustomerId}`
-        : "http://localhost:4000/customer";
+        ? `${process.env.REACT_APP_BACKEND_URL}/${editingCustomerId}`
+        : `${process.env.REACT_APP_BACKEND_URL}/customer`;
       const method = editingCustomerId ? "PUT" : "POST";
   
       // Fetch request
@@ -122,7 +122,7 @@ const Customer = () => {
         resetForm(); // Reset the form after successful submission
   
         // Fetch customers again after successful save
-        const fetchResponse = await fetch("http://localhost:4000/customer", {
+        const fetchResponse = await fetch(`${process.env.REACT_APP_BACKEND_URL}/customer`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -181,7 +181,7 @@ const Customer = () => {
 
   const handleDelete = async (id) => {
     try {
-      const response = await fetch(`http://localhost:4000/customer/${id}`, {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/customer/${id}`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",

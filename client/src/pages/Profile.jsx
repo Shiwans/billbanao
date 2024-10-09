@@ -29,7 +29,7 @@ const Profile = () => {
   useEffect(() => {
     const fetchCust = async () => {
       try {
-        const response = await fetch("http://localhost:4000/customer",{
+        const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/customer`,{
           headers:{
             "Content-Type":"application/json",
             Authorization: `Bearer ${token}`,
@@ -57,7 +57,7 @@ const Profile = () => {
         const name = selectedCustomer.name;
         try {
           const salesResponse = await fetch(
-            `http://localhost:4000/sales/customer?name=${name}`
+            `${process.env.REACT_APP_BACKEND_URL}/sales/customer?name=${name}`
           ,{
             headers:{
               "Content-Type":"application/json",
@@ -69,7 +69,7 @@ const Profile = () => {
           setSales(salesData.data);
 
           const payResponse = await fetch(
-            `http://localhost:4000/payment/pay?name=${name}`
+            `${process.env.REACT_APP_BACKEND_URL}/payment/pay?name=${name}`
           ,{
             headers:{
               "Content-Type":"application/json",

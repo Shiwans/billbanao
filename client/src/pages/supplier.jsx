@@ -39,7 +39,7 @@ const Supplier = () => {
   useEffect(() => {
     const fetchSupp = async () => {
       try {
-        const response = await fetch("http://localhost:4000/supplier", {
+        const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/supplier`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -68,7 +68,7 @@ const Supplier = () => {
 
   const handleDelete = async (id) => {
     try {
-      const response = await fetch(`http://localhost:4000/supplier/${id}`, {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/supplier/${id}`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
@@ -114,8 +114,8 @@ const Supplier = () => {
     try {
       const method = editingSupplierId ? "PUT" : "POST";
       const url = editingSupplierId
-        ? `http://localhost:4000/supplier/${editingSupplierId}`
-        : "http://localhost:4000/supplier";
+        ? `${process.env.REACT_APP_BACKEND_URL}/supplier/${editingSupplierId}`
+        : `${process.env.REACT_APP_BACKEND_URL}/supplier`;
       const response = await fetch(url, {
         method,
         headers: {
@@ -156,7 +156,7 @@ const Supplier = () => {
 
       resetForm();
 
-      const response = await fetch("http://localhost:4000/supplier",{
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/supplier`,{
         method:"GET",
         headers:{
           "Content-Type":"application/json",

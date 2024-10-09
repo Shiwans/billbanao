@@ -28,7 +28,7 @@ const DateQuery = () => {
   useEffect(() => {
     const fetchCustomers = async () => {
       try {
-        const response = await fetch("http://localhost:4000/customer", {
+        const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/customer```, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -57,7 +57,7 @@ const DateQuery = () => {
         });
 
         const response = await fetch(
-          `http://localhost:4000/sales/fetch?${queryParams}`,
+          `${process.env.REACT_APP_BACKEND_URL}/sales/fetch?${queryParams}`,
           {
             method: "GET",
             headers: {
@@ -102,7 +102,7 @@ const DateQuery = () => {
 
   const handleDelete = async (id) => {
     try {
-      const response = await fetch(`http://localhost:4000/sales/${id}`, {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/sales/${id}`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
@@ -174,7 +174,7 @@ const DateQuery = () => {
     // };
     try {
       const response = await fetch(
-        `http://localhost:4000/sales/${editingRow}`,
+       `${process.env.REACT_APP_BACKEND_URL}/sales/${editingRow}`,
         {
           method: "PUT",
           headers: {

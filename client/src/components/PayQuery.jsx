@@ -28,7 +28,7 @@ const PayQuery = () => {
     const fetchCustomers = async () => {
       try {
         //here i am fetching both customer and supplier as they are the once where i'll pay or i'll get
-        const response = await fetch("http://localhost:4000/customer", {
+        const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/customer`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -37,7 +37,7 @@ const PayQuery = () => {
           credentials: "include",
         });
 
-        const response2 = await fetch("http://localhost:4000/supplier", {
+        const response2 = await fetch(`${process.env.REACT_APP_BACKEND_URL}/supplier`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -73,7 +73,7 @@ const PayQuery = () => {
           payerName: name,
         });
 
-        const response = await fetch(`http://localhost:4000/payment/fetch?${queryParams}`, {
+        const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/payment/fetch?${queryParams}`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -110,7 +110,7 @@ const PayQuery = () => {
 
   const handleDelete = async (id) => {
     try {
-      const response = await fetch(`http://localhost:4000/payment/${id}`, {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/payment/${id}`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
@@ -168,7 +168,7 @@ const PayQuery = () => {
   const handleSaveEdit = async () => {
     try {
       const response = await fetch(
-        `http://localhost:4000/payment/${editingRow}`,
+        `${process.env.REACT_APP_BACKEND_URL}/payment/${editingRow}`,
         {
           method: "PUT",
           headers: {

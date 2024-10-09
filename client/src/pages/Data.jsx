@@ -36,7 +36,7 @@ const Reports = () => {
   useEffect(() => {
     const fetchCustomers = async () => {
       try {
-        const response = await fetch("http://localhost:4000/customer", {
+        const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/customer`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -86,7 +86,7 @@ const Reports = () => {
             endDate: formattedEndDate,
           }).toString();
           const response = await fetch(
-            `http://localhost:4000/sales?${queryParams}`,
+            `${process.env.REACT_APP_BACKEND_URL}/sales?${queryParams}`,
             {
               method: "GET",
               headers: {

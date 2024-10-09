@@ -18,7 +18,7 @@ const MonthDaysDropdown = () => {
 
     try {
       const response = await fetch(
-        `http://localhost:4000/sales?${queryParams}`,
+        `${process.env.REACT_APP_BACKEND_URL}/sales?${queryParams}`,
         {
           method: "GET",
           headers: {
