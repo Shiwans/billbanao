@@ -256,9 +256,10 @@ const Reports = () => {
         <div className="table-container">
           <div className="flex justify-between mb-1">
             <h2 className="font-medium text-lg">Sales Report</h2>
-            <button className="pdf-button	" onClick={handleClick}>
+            {/* pdf here */}
+            {/* <button className="pdf-button	" onClick={handleClick}>
               Export
-            </button>
+            </button> */}
           </div>
           <table className="sales-table" id="my-table">
             <thead>

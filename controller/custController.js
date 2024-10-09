@@ -81,4 +81,29 @@ const deleteCustomer = async (req, res) => {
     }
 };
 
-module.exports = { fetchData, addCustomer, updateCustomer, deleteCustomer };
+const receivePayment = async (req, res) => {
+    const { customerId, paymentAmount } = req.body; // Expecting customerId and paymentAmount in the request body
+
+    try {
+        const customer = await Customer.findById(customerId);
+
+        if (!customer) {
+            return res.status(404).json({ message: 'Customer not found' });
+        }
+        // Update the total due amount
+        if (customer.totalDue - paymentAmount < 0) {
+            return res.status(400).json({ message: 'Payment exceeds total due amount' });
+        }
+
+        customer.totalDue -= paymentAmount;
+
+        await customer.save();
+
+        res.status(200).json({ message: 'Payment received successfully', data: customer });
+    } catch (error) {
+        console.error('Error receiving payment:', error);
+        res.status(500).json({ message: 'Error receiving payment', error });
+    }
+};
+
+module.exports = { fetchData, addCustomer, updateCustomer, deleteCustomer,receivePayment };

@@ -67,12 +67,14 @@ const Payment = () => {
   const [payerType, setPayerType] = useState("");
   const [method, setMethod] = useState("");
   const [name, setName] = useState("");
-  const [amount, setAmount] = useState(0);
   const [date, setDate] = useState("");
   const [recentPayments, setRecentPayments] = useState([]);
   const [customerList, setCustomerList] = useState([]);
   const [showPopup, setShowPopup] = useState(false);
   const [paymentType, setPaymentType] = useState("received"); // Default to "received"
+  const [customergId,setCustomerId] = useState("")
+  const [suppliergId,setSupplierId] = useState("")
+  const [amount, setAmount] = useState(0);
 
   const token = localStorage.getItem("token");
 
@@ -160,6 +162,121 @@ const Payment = () => {
     }
   }, [token, showPopup, recentPayments]);
 
+  const handleClick = () => {
+    setShowPopup(true);
+  };
+
+  const handleClose = () => {
+    setShowPopup(false);
+  };
+
+  const handleNameChange = (e) => {
+    const selectedName = e.target.value;
+    setName(selectedName);
+
+    const selectedCustomer = customerList.find(
+      (cust) => cust.name === selectedName
+    );
+    if (selectedCustomer) {
+      setPayerType(selectedCustomer.payerType);
+      if (selectedCustomer.payerType === "customer") {
+        setCustomerId(selectedCustomer._id); 
+        setSupplierId(""); 
+      } else if (selectedCustomer.payerType === "supplier") {
+        setSupplierId(selectedCustomer._id); 
+        setCustomerId(""); 
+      }
+    
+      console.log("Customer or Supplier selected:", selectedCustomer.payerType, selectedCustomer._id);
+    } else {
+      setPayerType("");
+      setCustomerId("");
+      setSupplierId("");
+    }
+  
+  };
+
+  const updateSupplierDueAmount = async (supplierId, amount) => {
+  // const updateSupplierDueAmount = async () => {
+    try {
+      const response = await fetch(`http://localhost:4000/supplier/payment`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`, // Assuming you need authorization
+        },
+        body: JSON.stringify({
+          paymentAmount: parseInt(amount), // The new due amount to update
+          supplierId:suppliergId
+        }),
+      });
+  
+      if (response.ok) {
+        toast.success("Supplier due amount updated!", {
+          position: "top-right",
+          autoClose: 1000,
+          theme: "dark",
+          transition: Slide,
+        });
+      } else {
+        toast.error("Failed to update supplier due amount!", {
+          position: "top-right",
+          autoClose: 1000,
+          theme: "dark",
+          transition: Slide,
+        });
+      }
+    } catch (error) {
+      toast.error("Error updating supplier due amount!", {
+        position: "top-right",
+        autoClose: 1000,
+        theme: "dark",
+        transition: Slide,
+      });
+    }
+  };
+  
+
+  const updateCustomerDueAmount = async (customerId, amount) => {
+    // const updateSupplierDueAmount = async () => {
+      try {
+        const response = await fetch(`http://localhost:4000/customer/payment`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`, // Assuming you need authorization
+          },
+          body: JSON.stringify({
+            paymentAmount: parseInt(amount), // The new due amount to update
+            customerId:customergId
+          }),
+        });
+    
+        if (response.ok) {
+          toast.success("Supplier due amount updated!", {
+            position: "top-right",
+            autoClose: 1000,
+            theme: "dark",
+            transition: Slide,
+          });
+        } else {
+          toast.error("Failed to update supplier due amount!", {
+            position: "top-right",
+            autoClose: 1000,
+            theme: "dark",
+            transition: Slide,
+          });
+        }
+      } catch (error) {
+        toast.error("Error updating supplier due amount!", {
+          position: "top-right",
+          autoClose: 1000,
+          theme: "dark",
+          transition: Slide,
+        });
+      }
+    };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -189,6 +306,11 @@ const Payment = () => {
           transition: Slide,
         });
 
+        if(payerType){
+          const sendReq = await payerType ==="customer" ?  updateCustomerDueAmount(customergId,amount):updateSupplierDueAmount(suppliergId, amount);
+          console.log('sendReq',sendReq)
+        }
+
         // Reset form fields after successful submission
         setPayerType("");
         setMethod("");
@@ -210,29 +332,6 @@ const Payment = () => {
         theme: "dark",
         transition: Slide,
       });
-    }
-  };
-
-  const handleClick = () => {
-    setShowPopup(true);
-  };
-
-  const handleClose = () => {
-    setShowPopup(false);
-  };
-
-  const handleNameChange = (e) => {
-    const selectedName = e.target.value;
-    setName(selectedName);
-
-    const selectedCustomer = customerList.find(
-      (cust) => cust.name === selectedName
-    );
-
-    if (selectedCustomer) {
-      setPayerType(selectedCustomer.payerType);
-    } else {
-      setPayerType("");
     }
   };
 
@@ -416,3 +515,5 @@ const Payment = () => {
 };
 
 export default Payment;
+
+

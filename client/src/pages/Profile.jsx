@@ -147,8 +147,8 @@ const Profile = () => {
       link.click();
 
       // Share via WhatsApp
-      const whatsappURL = `https://api.whatsapp.com/send?text=Check%20out%20this%20table%20content%20PDF:%20${encodeURIComponent(blobURL)}`;
-      window.open(whatsappURL, '_blank');
+      // const whatsappURL = `https://api.whatsapp.com/send?text=Check%20out%20this%20table%20content%20PDF:%20${encodeURIComponent(blobURL)}`;
+      // window.open(whatsappURL, '_blank');
 
       // Revoke the Blob URL after use to free up memory
       URL.revokeObjectURL(blobURL);
@@ -174,7 +174,10 @@ const Profile = () => {
               </span>
             </div>
             <div className="info-item">
-              <FcMoneyTransfer /> <span className="info">You'll get:</span>
+              <FcMoneyTransfer /> <span className="info">You'll get: {selectedCustomer.totalDue.toLocaleString("en-IN", {
+                          style: "currency",
+                          currency: "INR",
+                        }) || "N/A"}</span>
             </div>
             <div className="info-item">
               <FaAddressCard />{" "}
@@ -182,8 +185,8 @@ const Profile = () => {
                 {selectedCustomer?.contactInfo?.upi || "N/A"}
               </span>
             </div>
-            <FaWhatsappSquare className="icon-whatsapp" onClick={shareOnWhatsApp}/>
-          </div>
+            {/* <FaWhatsappSquare className="icon-whatsapp" onClick={shareOnWhatsApp}/> */}
+          </div> 
         </div>
 
         <h2 className="font-bold text-lg">Transactions</h2>

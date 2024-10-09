@@ -1,0 +1,105 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="./favi.ico" />
+    <title>Welcome to BillBanao</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .container {
+            text-align: center;
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+        p {
+            margin-bottom: 30px;
+            color: #666;
+        }
+        .login-button {
+            padding: 15px 30px;
+            background-color: #4285F4; /* Google blue */
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        .login-button:hover {
+            background-color: #357ae8;
+        }
+        .login-button:focus {
+            outline: 2px solid #357ae8; /* Outline for keyboard navigation */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Welcome to BillBanao</h1>
+        <p>Your one-stop solution for managing your business records!</p>
+        <button class="login-button" onclick="window.location.href='/auth/google'">Login with Google</button>
+    </div>
+    <script>
+        // Function to set a cookie
+        function setCookie(name, value, days) {
+            const d = new Date();
+            d.setTime(d.getTime() + (days*24*60*60*1000));
+            const expires = "expires=" + d.toUTCString();
+            document.cookie = name + "=" + value + ";" + expires + ";path=/";
+        }
+
+        // Function to get a cookie by name
+        function getCookie(name) {
+            const nameEQ = name + "=";
+            const ca = document.cookie.split(';');
+            for(let i = 0; i < ca.length; i++) {
+                let c = ca[i];
+                while (c.charAt(0) === ' ') c = c.substring(1,c.length);
+                if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length,c.length);
+            }
+            return null;
+        }
+
+        window.onload = function() {
+            const token = getCookie('token');
+            const redirectUrl = 'http://localhost:3000/supplier'; // Dashboard route
+
+            console.log('Existing token (from cookie):', token); // Check for existing token
+
+            if (token) {
+                // Token exists, redirect to the dashboard
+                window.location.href = redirectUrl;
+            } else {
+                // Check URL for a new token
+                const urlParams = new URLSearchParams(window.location.search);
+                const newToken = urlParams.get('token');
+                console.log('Retrieved token from URL:', newToken); // Log the token
+
+                if (newToken) {
+                    setCookie('token', newToken, 7); // Store the JWT in a cookie (7 days expiry)
+                    console.log('Token stored in cookie:', newToken); // Log the stored token
+                    // Redirect to the dashboard after storing the token
+                    window.location.href = redirectUrl;
+                }
+            }
+        };
+    </script>
+</body>
+</html> -->

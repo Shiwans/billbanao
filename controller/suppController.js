@@ -105,4 +105,30 @@ const deleteSupplier = async (req, res) => {
     }
 };
 
-module.exports = { fetchData, addSupplier, updateSupplier, deleteSupplier };
+const makePayment = async (req, res) => {
+    const { supplierId, paymentAmount } = req.body; // Expecting supplierId and paymentAmount in the request body
+
+    try {
+        const supplier = await Supplier.findById(supplierId);
+
+        if (!supplier) {
+            return res.status(404).json({ message: 'Supplier not found' });
+        }
+
+        // Update the total due amount
+        if (supplier.totalDue - paymentAmount < 0) {
+            return res.status(400).json({ message: 'Payment exceeds total due amount' });
+        }
+
+        supplier.totalDue -= paymentAmount;
+
+        await supplier.save();
+
+        res.status(200).json({ message: 'Payment made successfully', data: supplier });
+    } catch (error) {
+        console.error('Error making payment:', error);
+        res.status(500).json({ message: 'Error making payment', error });
+    }
+};
+
+module.exports = { fetchData, addSupplier, updateSupplier, deleteSupplier,makePayment };

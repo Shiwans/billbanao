@@ -9,4 +9,8 @@ router.post('/',  customerController.addCustomer);
 router.put('/:id',  customerController.updateCustomer);
 router.delete('/:id' , customerController.deleteCustomer);
 
+//descrition /customer/payment
+router.post('/payment',  customerController.receivePayment);
+
+
 module.exports = router;
