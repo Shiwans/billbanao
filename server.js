@@ -27,7 +27,7 @@ app.use(cookieParser());
 app.use(morgan("dev"));
 
 // Serve static files
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, 'client/build')));
 
 // Protected routes
 app.use("/customer",authenticateToken,require("./routes/customer"));
@@ -37,6 +37,10 @@ app.use("/sales",authenticateToken, require("./routes/sales"));
 app.use("/purchase",authenticateToken, require("./routes/purchase"));
 app.use("/api", require("./routes/auth"));
 app.use("/", require("./routes/dashboard"));
+
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'client/build', 'index.html'));
+});
 
 const PORT = process.env.PORT || 4500;
 app.listen(PORT, () => console.log(`Server is running on http://localhost:${PORT}`));
