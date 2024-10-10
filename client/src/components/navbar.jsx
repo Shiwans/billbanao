@@ -133,12 +133,12 @@ const Navbar = () => {
               {!isSmallScreen && <ListItemText primary="Login" />}
             </ListItem>
           )}
-           <ListItem button component={Link} to="/setting" aria-label="Settings">
+           {/* <ListItem button component={Link} to="/setting" aria-label="Settings">
             <ListItemIcon sx={{ color: '#fff' }}>
               <Settings />
             </ListItemIcon>
             {!isSmallScreen && <ListItemText primary="Settings" />}
-          </ListItem> 
+          </ListItem>  */}
         </List>
       </Box>
     </Drawer>

@@ -13,7 +13,7 @@ const customerSchema = new mongoose.Schema({
         phone: {
             type: Number,
             required: true,
-            unique: true,
+            // unique: true,
             validate: {
                 validator: function (v) {
                     return /^\d{10}$/.test(v);
