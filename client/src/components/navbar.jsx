@@ -1,5 +1,6 @@
 import React from 'react';
 import { Drawer, List, ListItem, ListItemIcon, ListItemText, Divider, Typography, Box } from '@mui/material';
+import FeedIcon from '@mui/icons-material/Feed';
 import { BiSolidPurchaseTagAlt } from "react-icons/bi";
 import { Link, useNavigate } from 'react-router-dom';
 import { Dashboard, People, LocalShipping, ShoppingCart, Payment, Assessment, Today, AccountCircle, Settings, Logout, Login } from '@mui/icons-material';
@@ -133,12 +134,19 @@ const Navbar = () => {
               {!isSmallScreen && <ListItemText primary="Login" />}
             </ListItem>
           )}
-           {/* <ListItem button component={Link} to="/setting" aria-label="Settings">
-            <ListItemIcon sx={{ color: '#fff' }}>
-              <Settings />
-            </ListItemIcon>
-            {!isSmallScreen && <ListItemText primary="Settings" />}
-          </ListItem>  */}
+           <ListItem button component={Link} to="https://forms.gle/u5wjABKPuy5utNHD6" aria-label="Settings">  
+              <FeedIcon sx={{ color: '#fff' }}>
+              
+            </FeedIcon>
+            <span className='mr-6'></span>
+            {!isSmallScreen && <ListItemText primary="feedback" />}
+           </ListItem>
+           {/* <ListItem button component={Link} to="/setting" aria-label="Settings"> */}
+            {/* <ListItemIcon sx={{ color: '#fff' }}> */}
+              {/* <Settings /> */}
+            {/* </ListItemIcon> */}
+            {/* {!isSmallScreen && <ListItemText primary="Settings" />} */}
+          {/* </ListItem>  */}
         </List>
       </Box>
     </Drawer>
