@@ -20,28 +20,28 @@ const reportSchema = new mongoose.Schema(
         totalSales: {
             amount: {
                 type: Number,
-                default: 0, // Total sales amount in the time frame
+                default: 0, 
             },
             numberOfTransactions: {
                 type: Number,
-                default: 0, // Total number of sales transactions
+                default: 0, 
             },
         },
         averagePrice: {
             type: Number,
-            default: 0, // Average price per sale transaction
+            default: 0, 
         },
         totalAmountToPay: {
             type: Number,
-            default: 0, // Total amount customer needs to pay
+            default: 0, 
         },
         profitOrLoss: {
             type: Number,
-            default: 0, // Net profit or loss
+            default: 0, 
         },
         totalPurchaseAmount: {
             type: Number,
-            default: 0, // Total amount spent on purchases
+            default: 0,
         },
         salesBreakdown: [
             {
@@ -69,11 +69,9 @@ reportSchema.methods.calculateTotals = async function (salesData, purchasesData)
     const totalSalesAmount = salesData.reduce((sum, sale) => sum + sale.totalAmount, 0);
     const numberOfTransactions = salesData.length;
     const averagePrice = numberOfTransactions > 0 ? totalSalesAmount / numberOfTransactions : 0;
-
     const totalPurchaseAmount = purchasesData.reduce((sum, purchase) => sum + purchase.amount, 0);
 
     const totalAmountToPay = salesData.reduce((sum, sale) => sum + sale.totalDue, 0);
-
     const profitOrLoss = totalSalesAmount - totalPurchaseAmount;
 
     // Assign the values to the report

@@ -15,7 +15,6 @@ import {
 } from "@mui/material";
 import TableCell, { tableCellClasses } from "@mui/material/TableCell";
 
-// Styled Table Cell
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
     backgroundColor: theme.palette.common.black,
@@ -81,11 +80,11 @@ const Today = () => {
   // const [list, setList] = useState([]);
   const [customers, setCustomer] = useState([]);
   const [suppliers, setSupplier] = useState([]);
-  const [allSales, setAllSales] = useState([]); // Initialize as an empty array
+  const [allSales, setAllSales] = useState([]); 
   const [activeTab, setActiveTab] = useState("customer");
   const today = new Date().toISOString().split("T")[0];
   const [customerId,setCustomerId] = useState("")
-const [type,setType] = useState("")
+  const [type,setType] = useState("")
 
   const token = localStorage.getItem("token");
   useEffect(() => {
@@ -212,7 +211,7 @@ const [type,setType] = useState("")
         console.error("Error fetching data", error);
         setCustomer([]);
         setSupplier([]);
-        // setAllSales([]); // Ensure this is set to an empty array on error
+        // setAllSales([]); //empty array on error
       }
     };
     fetchCustomersAndSuppliers();
@@ -247,17 +246,6 @@ const [type,setType] = useState("")
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        // body: JSON.stringify({
-        //   date: today,
-        //   name,
-        //   quantity: Number(quantity),
-        //   price: Number(value),
-        //   paymentStatus: payment,
-        //   paymentDetails: {
-        //     paidAmount: Number(updatedPaidAmount),
-        //     dueAmount: Number(updatedDueAmount),
-        //   },
-        // }),
         body: JSON.stringify({
           date: today,
           name,
@@ -328,8 +316,8 @@ const [type,setType] = useState("")
   const filteredSales = allSales.filter(
     (sale) =>
       activeTab === "customer"
-        ? sale.type && sale.type.includes("customer") // Check if sale.type is defined
-        : sale.type && sale.type.includes("supplier") // Check if sale.type is defined
+        ? sale.type && sale.type.includes("customer") 
+        : sale.type && sale.type.includes("supplier") 
   );
 
   const renderPaymentDetails = () =>
@@ -354,7 +342,6 @@ const [type,setType] = useState("")
           <Grid item xs={6}>
             <TextField
               label="Due Amount"
-              // className={classes.textField}
               type="number"
               value={dueAmount}
               onChange={(e) => setDueAmount(e.target.value)}

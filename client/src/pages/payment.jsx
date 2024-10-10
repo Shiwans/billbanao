@@ -71,7 +71,7 @@ const Payment = () => {
   const [recentPayments, setRecentPayments] = useState([]);
   const [customerList, setCustomerList] = useState([]);
   const [showPopup, setShowPopup] = useState(false);
-  const [paymentType, setPaymentType] = useState("received"); // Default to "received"
+  const [paymentType, setPaymentType] = useState("received"); 
   const [customergId,setCustomerId] = useState("")
   const [suppliergId,setSupplierId] = useState("")
   const [amount, setAmount] = useState(0);
@@ -115,7 +115,7 @@ const Payment = () => {
         ]);
       } catch (error) {
         console.error("Unable to fetch customer/supplier list", error);
-        setCustomerList([]); // Fallback in case of error
+        setCustomerList([]); 
       }
     };
 

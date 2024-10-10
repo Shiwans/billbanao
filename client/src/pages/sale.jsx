@@ -33,7 +33,7 @@ const useStyles = makeStyles((theme) => ({
       color: "white", // Label
     },
     "& .MuiInputLabel-root.Mui-focused": {
-      color: "#91b9ff", // Label color when focused
+      color: "#91b9ff", 
     },
     "& .MuiOutlinedInput-root": {
       "& fieldset": {

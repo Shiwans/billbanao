@@ -53,10 +53,10 @@ const updateSupplier = async (req, res) => {
             return res.status(400).json({ message: 'All fields are required for updating' });
         }
 
-        // const supplierExists = await Supplier.findOne({ name, _id: { $ne: id }, userId: req.user.id });
-        // if (supplierExists) {
-        //     return res.status(400).json({ message: 'A supplier with the same name already exists' });
-        // }    
+        const supplierExists = await Supplier.findOne({ name, userId: req.user.id });
+        if (supplierExists) {
+            return res.status(400).json({ message: 'A supplier with the same name already exists' });
+        }
 
         const updatedSupplier = await Supplier.findOneAndUpdate(
             { _id: supplierId, userId: req.user.id },
@@ -93,11 +93,9 @@ const deleteSupplier = async (req, res) => {
         }
 
        // Delete related payments using the supplierId
-       await Payment.deleteMany({ supplierId: req.params.id });
-       // Assuming you have a Sale model to delete related sales as well
-       await Sale.deleteMany({ supplierId: req.params.id });
+        await Payment.deleteMany({ supplierId: req.params.id });
+        await Sale.deleteMany({ supplierId: req.params.id });
         await Supplier.findByIdAndDelete(req.params.id);
-
         res.status(200).json({ message: 'Supplier and related sales and payments deleted successfully' });
     } catch (error) {
         console.error('Error deleting supplier:', error);
@@ -106,7 +104,7 @@ const deleteSupplier = async (req, res) => {
 };
 
 const makePayment = async (req, res) => {
-    const { supplierId, paymentAmount } = req.body; // Expecting supplierId and paymentAmount in the request body
+    const { supplierId, paymentAmount } = req.body;
 
     try {
         const supplier = await Supplier.findById(supplierId);

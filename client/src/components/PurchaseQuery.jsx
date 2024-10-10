@@ -148,8 +148,8 @@ const PurchaseQuery = () => {
   };
 
   const handleEdit = (purchase) => {
-    setEditingRow(purchase._id); // Set the current row to edit
-    setEditData(purchase); // Pre-fill the editing form with current row data
+    setEditingRow(purchase._id); 
+    setEditData(purchase); 
   };
 
   const handleCancelEdit = () => {

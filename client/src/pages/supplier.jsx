@@ -106,8 +106,6 @@ const Supplier = () => {
     }
   };
 
-
-
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -244,7 +242,7 @@ return (
               variant="outlined"
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
-              error={phone.length !== 10 && phone.length > 0} // Show error if not exactly 10 digits
+              error={phone.length !== 10 && phone.length > 0} 
                 helperText={phone.length !== 10 && phone.length > 0 ? "Phone number must be exactly 10 digits." : ""}
             />
           </Grid>

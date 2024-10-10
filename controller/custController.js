@@ -4,7 +4,6 @@ const Payment= require('../Model/Payment')
 
 const fetchData = async (req, res) => {
     try {
-        // const data = await Customer.find({userId:req.user.id});// Fetch customers for the authenticated user
         const data = await Customer.find({ userId: req.user.id })
         res.status(200).json({ message: 'Here are all the customers', data: data });
     } catch (error) {
@@ -16,8 +15,6 @@ const fetchData = async (req, res) => {
 const addCustomer = async (req, res) => {
     try {
         const { name, contactInfo, type, totalPaid, totalAmount, totalDue } = req.body;
-
-        // Assuming req.user.id is properly set after token verification
         const custCheck = await Customer.findOne({ name, userId: req.user.id });
 
         if (custCheck) {
@@ -25,7 +22,7 @@ const addCustomer = async (req, res) => {
         }
 
         const newCust = new Customer({
-            userId: req.user.id, // This should reference a valid User ObjectId
+            userId: req.user.id, 
             name,
             contactInfo,
             type,
@@ -47,9 +44,9 @@ const updateCustomer = async (req, res) => {
     try {
         const { name, contactInfo, type, totalPaid, totalAmount, totalDue } = req.body;
         const updatedCustomer = await Customer.findByIdAndUpdate(
-            { _id: req.params.id, userId: req.user._id }, // Ensure customer belongs to the user
+            { _id: req.params.id, userId: req.user._id }, 
             { name, contactInfo, type, totalPaid, totalAmount, totalDue },
-            { new: true, runValidators: true } // return the updated document
+            { new: true, runValidators: true } 
         );
 
         if (!updatedCustomer) {
@@ -82,7 +79,7 @@ const deleteCustomer = async (req, res) => {
 };
 
 const receivePayment = async (req, res) => {
-    const { customerId, paymentAmount } = req.body; // Expecting customerId and paymentAmount in the request body
+    const { customerId, paymentAmount } = req.body; 
 
     try {
         const customer = await Customer.findById(customerId);
@@ -90,7 +87,7 @@ const receivePayment = async (req, res) => {
         if (!customer) {
             return res.status(404).json({ message: 'Customer not found' });
         }
-        // Update the total due amount
+        
         if (customer.totalDue - paymentAmount < 0) {
             return res.status(400).json({ message: 'Payment exceeds total due amount' });
         }

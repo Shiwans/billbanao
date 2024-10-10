@@ -54,7 +54,6 @@ const updateSale = async (req, res) => {
     const updatedData = req.body;
 
     try {
-        // Find the sale by ID and update it with new data
         const sale = await Sale.findByIdAndUpdate(
             { _id: id, userId: req.user.id },
             updatedData,

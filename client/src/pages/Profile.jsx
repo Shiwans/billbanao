@@ -128,16 +128,12 @@ const Profile = () => {
     jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' },
   };
 
-  // Generate PDF directly from the HTML element
   html2pdf()
     .from(element)
     .set(options)
     .outputPdf('blob') // Generate a Blob from the PDF
     .then((pdfBlob) => {
-      // Create an Object URL for the Blob
       const blobURL = URL.createObjectURL(pdfBlob);
-
-      // Open the generated PDF in a new tab (optional)
       window.open(blobURL);
 
       // Programmatically trigger a download (optional)

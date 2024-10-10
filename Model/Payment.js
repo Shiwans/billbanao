@@ -38,7 +38,7 @@ const paymentSchema = new mongoose.Schema({
     },paymentType: {
         type: String,
         enum: ['received', 'paid'],
-        required: true, // Ensure this field is required
+        required: true, 
     },
 }, { timestamps: true });
 

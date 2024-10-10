@@ -35,16 +35,18 @@ const addPayment = async (req, res) => {
   }
 };
 
-// const addPayment =async (req,res) =>{
+// update payement
+// const updatePayment =async (req,res) =>{
 //     try{
-//         const { payerType,payerName,amount,paymentDate,method } = req.body
-//         const newPayment = new Payment({
-//             payerType,payerName,amount,paymentDate,method,
-//             userId:req.user.id
-//         })
+//         const { payerType,payerName,amount,paymentDate,method,paymentType } = req.body
+//         const updatedCustomer = await Customer.findByIdAndUpdate(
+//           { _id: req.params.id, userId: req.user._id }, // Ensure customer belongs to the user
+//           { name, contactInfo, type, totalPaid, totalAmount, totalDue },
+//           { new: true, runValidators: true } // return the updated document
+//       );
 //         await Customer.findOneAndUpdate(
 //             { name: payerName,userId:req.user.id },
-//             { $inc: { totalJama: amount } } // Assuming totalJama is the correct field to update
+//             { $inc: { totalJama: amount } } 
 //         );
 //         res.status(200).json({message:'new payment added',newPayment})
 
@@ -53,6 +55,7 @@ const addPayment = async (req, res) => {
 //         res.status(500).json({message:"unable to add payment"})
 //     }
 // }
+
 const fetchNameDate = async (req, res) => {
   try {
     const { payerName, paymentDate } = req.query;

@@ -37,7 +37,7 @@ const Dashboard = () => {
         }
 
         const result = await response.json();
-        console.log(result); // Debugging purposes, log the result from backend
+        console.log(result); 
         setData({
           salesAmount: result.salesAmount,
           purchaseAmount: result.purchaseAmount,

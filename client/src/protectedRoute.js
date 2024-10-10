@@ -4,7 +4,7 @@ import { Navigate } from 'react-router-dom';
 
 const ProtectedRoute = ({ element }) => {
     const isAuthenticated = () => {
-        const token = localStorage.getItem('token'); // Get the token from localStorage
+        const token = localStorage.getItem('token');
         return token !== null; // Return true if token exists
     };
 
