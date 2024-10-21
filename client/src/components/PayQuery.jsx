@@ -19,7 +19,7 @@ const PayQuery = () => {
   const [PayData, setPayData] = useState([]); //instead of sales data
   const [filteredData, setFilteredData] = useState([]);
   const [customerList, setCustomerList] = useState([]);
-  const [editingRow, setEditingRow] = useState(null); // Track the row being edited
+  const [editingRow, setEditingRow] = useState(null); 
   const [editData, setEditData] = useState({}); // Hold the row data for editing
   // const [paidAmount, setPaidAmount] = useState("");
   const token = localStorage.getItem("token");

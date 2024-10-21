@@ -165,7 +165,7 @@ const Supplier = () => {
       const data = await response.json();
       setSupplier(data.data);
     } else {
-      toast.error(`Error saving customer! ${data.message || 'Please try again.'}`, {
+      toast.error(`Error saving supplier! ${data.message || 'Please try again.'}`, {
         position: "top-right",
         autoClose: 1000,
       });

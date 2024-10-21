@@ -16,7 +16,7 @@ const app = express();
 
 // CORS setup
 app.use(cors({
-  origin: process.env.CLIENT_URL||'http://localhost:3000',
+  origin: process.env.CLIENT_URL,
   methods: "GET,POST,PUT,DELETE",
   credentials: true,
 }));
@@ -40,7 +40,7 @@ app.use("/", require("./routes/dashboard"));
 
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'client/build', 'index.html'));
-});
+})
 
 const PORT = process.env.PORT || 4500;
 app.listen(PORT, () => console.log(`Server is running on http://localhost:${PORT}`));

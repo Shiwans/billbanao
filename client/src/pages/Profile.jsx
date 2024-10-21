@@ -7,12 +7,13 @@ import {
   FaEnvelope,
   FaWhatsappSquare,
   FaAddressCard,
+  FaFileDownload
 } from "react-icons/fa";
 import { FcMoneyTransfer } from "react-icons/fc";
-// import jsPDF from "jspdf";
-// import html2canvas from "html2canvas";
-import html2pdf from 'html2pdf.js';
-
+import generatePDF from "../components/download";
+import jsPDF from "jspdf";
+import html2canvas from "html2canvas";
+// import html2pdf from "html2pdf.js";
 
 const Profile = () => {
   const [activeTab, setActiveTab] = useState("dashboard");
@@ -25,16 +26,18 @@ const Profile = () => {
 
   const token = localStorage.getItem("token");
 
-
   useEffect(() => {
     const fetchCust = async () => {
       try {
-        const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/customer`,{
-          headers:{
-            "Content-Type":"application/json",
-            Authorization: `Bearer ${token}`,
+        const response = await fetch(
+          `${process.env.REACT_APP_BACKEND_URL}/customer`,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
           }
-        });
+        );
         const data = await response.json();
         setCustomer(data.data);
       } catch (error) {
@@ -57,25 +60,26 @@ const Profile = () => {
         const name = selectedCustomer.name;
         try {
           const salesResponse = await fetch(
-            `${process.env.REACT_APP_BACKEND_URL}/sales/customer?name=${name}`
-          ,{
-            headers:{
-              "Content-Type":"application/json",
-              Authorization: `Bearer ${token}`,
-
+            `${process.env.REACT_APP_BACKEND_URL}/sales/customer?name=${name}`,
+            {
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+              },
             }
-          });
+          );
           const salesData = await salesResponse.json();
           setSales(salesData.data);
 
           const payResponse = await fetch(
-            `${process.env.REACT_APP_BACKEND_URL}/payment/pay?name=${name}`
-          ,{
-            headers:{
-              "Content-Type":"application/json",
-              Authorization: `Bearer ${token}`,
-
-            }});
+            `${process.env.REACT_APP_BACKEND_URL}/payment/pay?name=${name}`,
+            {
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
           const payData = await payResponse.json();
           setPay(payData.data);
         } catch (error) {
@@ -84,7 +88,7 @@ const Profile = () => {
       };
       fetchSalesAndPayments();
     }
-  }, [selectedCustomer,token]);
+  }, [selectedCustomer, token]);
 
   const handleCustomerClick = (customer) => {
     setSelectedCustomer(customer);
@@ -108,49 +112,68 @@ const Profile = () => {
     );
 
 
-    // function generatePDF() {
-    //   const table = document.getElementById("profile-table"); // Replace 'yourTableId' with the actual table ID
-    //   html2canvas(table).then((canvas) => {
-    //     const imgData = canvas.toDataURL("image/png");
-    //     const pdf = new jsPDF();
-    //     pdf.addImage(imgData, "PNG", 10, 10);
-    //     pdf.save("table-content.pdf"); // This will download the PDF locally
+
+    function generatePDF() {
+      const table = document.getElementById("profile-table"); 
+      html2canvas(table, { scale: 1.5 }).then((canvas) => {
+        const imgData = canvas.toDataURL("image/jpeg", 0.9); // Compress the image
+        const pdf = new jsPDF({orientation:"landscape",unit: "mm",
+          format: "a4"});
+          pdf.setFontSize(16);
+
+    // Center the user's name
+    const pageWidth = pdf.internal.pageSize.getWidth();
+    const userName = selectedCustomer.name; // Ensure selectedCustomer is defined
+    const textWidth = pdf.getStringUnitWidth(userName) * pdf.internal.getFontSize() / pdf.internal.scaleFactor;
+    const xPosition = (pageWidth - textWidth) / 2; // Centered X position
+
+    pdf.text(userName, xPosition, 15); 
+
+    // Add space below the name
+    const imgYPosition = 20;
+
+    // Calculate image dimensions
+    const imgWidth = pageWidth - 20; // Set margins
+    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+    // Add the canvas image to the PDF (landscape orientation)
+    pdf.addImage(imgData, "JPEG", 10, imgYPosition, imgWidth, imgHeight); 
+        // pdf.addImage(imgData, "PNG", 10, 10);
+        pdf.save("table-content.pdf"); // This will download the PDF locally
+      });
+  }
+  
+
+
+    // function shareOnWhatsApp() {
+    //   const element = document.getElementById('profile-table');
+    //    // Options for generating the PDF
+    // const options = {
+    //   margin: 1,
+    //   filename: 'table-content.pdf',
+    //   html2canvas: { scale: 2 }, // Increase scale for better quality
+    //   jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' },
+    // };
+
+    // html2pdf()
+    //   .from(element)
+    //   .set(options)
+    //   .outputPdf('blob') // Generate a Blob from the PDF
+    //   .then((pdfBlob) => {
+    //     const blobURL = URL.createObjectURL(pdfBlob);
+    //     window.open(blobURL);
+    //     // Programmatically trigger a download (optional)
+    //     const link = document.createElement('a');
+    //     link.href = blobURL;
+    //     link.download = 'table-content.pdf';
+    //     link.click();
+    //     // const deployedURL = process.env.REACT_APP_FRONT_URL;
+    //     const whatsappURL = `https://api.whatsapp.com/send?text=Check%20out%20this%20table%20content%20PDF:%20${encodeURIComponent(blobURL)}`;
+    //     window.open(whatsappURL, '_blank');
+    //     // Revoke the Blob URL after use to free up memory
+    //     URL.revokeObjectURL(blobURL);
     //   });
-    // }
-
-    function shareOnWhatsApp() {
-      const element = document.getElementById('profile-table');
-       // Options for generating the PDF
-  const options = {
-    margin: 1,
-    filename: 'table-content.pdf',
-    html2canvas: { scale: 2 }, // Increase scale for better quality
-    jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' },
-  };
-
-  html2pdf()
-    .from(element)
-    .set(options)
-    .outputPdf('blob') // Generate a Blob from the PDF
-    .then((pdfBlob) => {
-      const blobURL = URL.createObjectURL(pdfBlob);
-      window.open(blobURL);
-
-      // Programmatically trigger a download (optional)
-      const link = document.createElement('a');
-      link.href = blobURL;
-      link.download = 'table-content.pdf';
-      link.click();
-
-      // Share via WhatsApp
-      // const whatsappURL = `https://api.whatsapp.com/send?text=Check%20out%20this%20table%20content%20PDF:%20${encodeURIComponent(blobURL)}`;
-      // window.open(whatsappURL, '_blank');
-
-      // Revoke the Blob URL after use to free up memory
-      URL.revokeObjectURL(blobURL);
-    });
-    }
-    
+    //   }
 
     return (
       <div className="profile-container">
@@ -170,10 +193,14 @@ const Profile = () => {
               </span>
             </div>
             <div className="info-item">
-              <FcMoneyTransfer /> <span className="info">You'll get: {selectedCustomer.totalDue.toLocaleString("en-IN", {
-                          style: "currency",
-                          currency: "INR",
-                        }) || "N/A"}</span>
+              <FcMoneyTransfer />{" "}
+              <span className="info">
+                You'll get:{" "}
+                {selectedCustomer.totalDue.toLocaleString("en-IN", {
+                  style: "currency",
+                  currency: "INR",
+                }) || 0}
+              </span>
             </div>
             <div className="info-item">
               <FaAddressCard />{" "}
@@ -181,8 +208,16 @@ const Profile = () => {
                 {selectedCustomer?.contactInfo?.upi || "N/A"}
               </span>
             </div>
-            {/* <FaWhatsappSquare className="icon-whatsapp" onClick={shareOnWhatsApp}/> */}
-          </div> 
+            {/* <FaWhatsappSquare
+              className="icon-whatsapp"
+              onClick={shareOnWhatsApp}
+            /> */}
+            <FaFileDownload 
+              className="icon-download"
+              onClick={generatePDF}
+            />
+
+          </div>
         </div>
 
         <h2 className="font-bold text-lg">Transactions</h2>

@@ -7,7 +7,8 @@ import { toast, Slide } from "react-toastify";
 // import { MdDelete } from "react-icons/md";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { jsPDF } from "jspdf";
+import jsPDF from "jspdf";
+import html2canvas from "html2canvas";
 import "jspdf-autotable";
 
 const Reports = () => {
@@ -23,27 +24,20 @@ const Reports = () => {
   const [customerList, setCustomerList] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
   const token = localStorage.getItem("token");
-
-  const handleClick = async () => {
-    const doc = new jsPDF();
-    doc.autoTable({
-      html: "#my-table",
-    });
-
-    doc.save("data.pdf");
-  };
-
   useEffect(() => {
     const fetchCustomers = async () => {
       try {
-        const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/customer`, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          credentials: "include",
-        });
+        const response = await fetch(
+          `${process.env.REACT_APP_BACKEND_URL}/customer`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            credentials: "include",
+          }
+        );
         const result = await response.json();
         setCustomerList(result.data);
       } catch (error) {
@@ -76,7 +70,7 @@ const Reports = () => {
         const formattedEndDate = endDate
           ? new Date(endDate).toISOString().split("T")[0]
           : "";
-        if(startDate && endDate){
+        if (startDate && endDate) {
           if (new Date(startDate) > new Date(endDate)) {
             toast.error("Start date cannot be later than end date!");
             return;
@@ -110,14 +104,14 @@ const Reports = () => {
 
   useEffect(() => {
     console.log("Current name for filtering:", name); // Log the name being filtered
-    console.log("Current sales data:", salesData); 
+    console.log("Current sales data:", salesData);
     if (!name) {
       setFilteredData(salesData);
       return;
     }
-  
+
     // Filter sales data based on selected customer name
-    const filteredList = salesData.filter(sale => sale.name === name);
+    const filteredList = salesData.filter((sale) => sale.name === name);
     console.log("Filtered data:", filteredList); // Log the filtered data
     setFilteredData(filteredList);
   }, [name, salesData]);
@@ -205,6 +199,49 @@ const Reports = () => {
   //   }
   // }
 
+  function generatePDF() {
+    const table = document.getElementById("my-table");
+    html2canvas(table, { scale: 1.5 }).then((canvas) => {
+      const imgData = canvas.toDataURL("image/jpeg", 0.9); // Compress the image
+      const pdf = new jsPDF({
+        orientation: "landscape",
+        unit: "mm",
+        format: "a4",
+      });
+      pdf.setFontSize(16);
+
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const userName = name;
+      const textWidth =
+        (pdf.getStringUnitWidth(userName) * pdf.internal.getFontSize()) /
+        pdf.internal.scaleFactor;
+      const xPosition = (pageWidth - textWidth) / 2; // Centered X position
+
+      pdf.text(userName, xPosition, 15);
+      // pdf.text(startDate,60,40)
+      // pdf.text(endDate,40,15)
+
+      const imgYPosition = 20;
+
+      // Calculate image dimensions
+      const imgWidth = pageWidth - 20; // Set margins
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+      // Add the canvas image to the PDF (landscape orientation)
+      pdf.addImage(imgData, "JPEG", 10, imgYPosition, imgWidth, imgHeight);
+
+      const infoYPosition = imgYPosition + imgHeight + 10; // 10mm space after the image
+      pdf.setFontSize(14); // Set font size for additional info
+      pdf.setTextColor(249 ,115, 22); // Red
+      pdf.text(`Total Due: ${totalDue.toLocaleString("en-IN")}`, 230, infoYPosition+10);
+      pdf.setTextColor(14 ,165 ,233); // Blue
+      pdf.text(`Total: ${totalAmount.toLocaleString("en-IN")}`, 170, infoYPosition); // Add total amount
+      pdf.setTextColor(16 ,185, 129); // green
+      pdf.text(`Total Jama: ${totalJama.toLocaleString("en-IN")}`, 230, infoYPosition);
+      pdf.save("table-content.pdf"); // This will download the PDF locally
+    });
+  }
+
   return (
     <div>
       <Navbar />
@@ -250,6 +287,7 @@ const Reports = () => {
             <button onClick={setLastDay}>Last Day</button>
             <button onClick={setLastWeek}>Last Week</button>
             <button onClick={setLastMonth}>Last Month</button>
+            <button onClick={generatePDF}>Download</button>
           </div>
         </div>
 
@@ -276,7 +314,7 @@ const Reports = () => {
             <tbody>
               {console.log("Sales data before showing on screen,", salesData)}
               {filteredData.length > 0 ? (
-                 filteredData.map((item) => (
+                filteredData.map((item) => (
                   <tr key={item.id}>
                     <td>{new Date(item.date).toLocaleDateString("en-GB")}</td>
                     <td>{item.name}</td>

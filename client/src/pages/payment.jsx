@@ -293,7 +293,8 @@ const Payment = () => {
           payerName: name,
           amount: parseInt(amount, 10),
           paymentDate: date,
-          paymentType
+          paymentType,
+          customergId
         }),
         credentials: "include",
       });

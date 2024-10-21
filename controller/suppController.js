@@ -53,10 +53,11 @@ const updateSupplier = async (req, res) => {
             return res.status(400).json({ message: 'All fields are required for updating' });
         }
 
-        const supplierExists = await Supplier.findOne({ name, userId: req.user.id });
-        if (supplierExists) {
-            return res.status(400).json({ message: 'A supplier with the same name already exists' });
-        }
+        //this is check if supplier added has same name as the already exist supplier
+        // const supplierExists = await Supplier.findOne({ name, userId: req.user.id });
+        // if (supplierExists) {
+        //     return res.status(400).json({ message: 'A supplier with the same name already exists' });
+        // }
 
         const updatedSupplier = await Supplier.findOneAndUpdate(
             { _id: supplierId, userId: req.user.id },

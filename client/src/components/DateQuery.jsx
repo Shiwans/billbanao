@@ -28,7 +28,7 @@ const DateQuery = () => {
   useEffect(() => {
     const fetchCustomers = async () => {
       try {
-        const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/customer```, {
+        const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/customer`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",

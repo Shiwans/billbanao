@@ -69,7 +69,7 @@ const Customer = () => {
     e.preventDefault();
     try {
       const url = editingCustomerId
-        ? `${process.env.REACT_APP_BACKEND_URL}/${editingCustomerId}`
+        ? `${process.env.REACT_APP_BACKEND_URL}/customer/${editingCustomerId}`
         : `${process.env.REACT_APP_BACKEND_URL}/customer`;
       const method = editingCustomerId ? "PUT" : "POST";
   
@@ -192,7 +192,7 @@ const Customer = () => {
         setCustomer((prevCust) =>
           prevCust.filter((customer) => customer._id !== id)
         );
-        toast.success("Supplier deleted successfully!", {
+        toast.success("Customer deleted successfully!", {
           position: "top-right",
           autoClose: 1000,
           hideProgressBar: false,

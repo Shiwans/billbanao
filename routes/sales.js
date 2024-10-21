@@ -5,7 +5,7 @@ const saleController = require('../controller/saleController')
 
 //description:-   fetching all sale records
 //route:-  GET /sales
-// router.get("/",saleController.fetchData)
+// router.get("/",saleController.fetchData) 
 
 //description:-   add a sale
 //route:-  POST /sales

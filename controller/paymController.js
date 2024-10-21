@@ -16,7 +16,7 @@ const fetchPayment = async (req, res) => {
 
 const addPayment = async (req, res) => {
   try {
-    const { payerType, payerName, amount, paymentDate, method,paymentType } = req.body;
+    const { payerType, payerName, amount, paymentDate, method,paymentType,customergId } = req.body;
     const newPayment = new Payment({
       payerType,
       payerName,
@@ -25,6 +25,7 @@ const addPayment = async (req, res) => {
       method,
       paymentType,
       userId: req.user.id,
+      customerId:customergId
     });
     await newPayment.save();
 
