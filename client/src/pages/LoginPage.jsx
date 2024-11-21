@@ -28,7 +28,7 @@ const LoginPage = () => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+          // Authorization: `Bearer ${token}`,
 
         },
         body: JSON.stringify({ email, password }),
@@ -83,10 +83,14 @@ const LoginPage = () => {
             </button>
           </form>
           <p className="toggle-link">
-              <>
+              <div>
                 Don't have an account?{" "}
                 <button type="button" onClick={() => (navigate('/register'))}>Register</button>
-              </>
+              </div>
+              <div>
+                Forget password?{" "}
+                <button type="button" onClick={() => (navigate('/forgetpassword'))}>Change password</button>
+              </div>
           </p>
         </div>
       </div>

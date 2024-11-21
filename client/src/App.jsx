@@ -17,6 +17,8 @@ import Purchase from './pages/Purchase'
 import RegisterPage from "./pages/RegisterPage"
 import ProtectedRoute from './protectedRoute'; 
 import './App.css';
+import ForgetPassword from "./pages/ForgetPassword";
+import SetPass from "./pages/SetPass";
 
 const App = () => {
   return (
@@ -37,6 +39,8 @@ const App = () => {
           {/* <Route path="/setting" element={<ProtectedRoute element={<Settings />} />} /> */}
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
+          <Route path="/forgetpassword" element={<ForgetPassword />} />
+          <Route path="/change/forgetpassword/:email/:ltoken" element={<SetPass />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </div>

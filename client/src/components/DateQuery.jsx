@@ -214,6 +214,8 @@ const DateQuery = () => {
       });
     }
   };
+  // console.log("sale")
+  // console.log(editingRow)
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -348,7 +350,7 @@ const DateQuery = () => {
                 editingRow === sale._id ? (
                   <TableRow key={sale._id}>
                     <TableCell>{editData.date}</TableCell>
-                    <TableCell>{editData.customerName}</TableCell>
+                    <TableCell>{editData.name}</TableCell>
                     <TableCell>
                       <TextField
                         name="quantity"
@@ -439,7 +441,7 @@ const DateQuery = () => {
                 ) : (
                   <TableRow key={sale._id}>
                     <TableCell>{sale.date}</TableCell>
-                    <TableCell>{sale.customerName}</TableCell>
+                    <TableCell>{sale.name}</TableCell>
                     <TableCell>{sale.quantity}</TableCell>
                     <TableCell>{sale.price}</TableCell>
                     <TableCell>

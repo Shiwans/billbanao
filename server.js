@@ -34,6 +34,7 @@ app.use("/customer",authenticateToken,require("./routes/customer"));
 app.use("/payment", authenticateToken,require("./routes/payment"));
 app.use("/supplier",authenticateToken, require("./routes/supplier"));
 app.use("/sales",authenticateToken, require("./routes/sales"));
+app.use("/change", require("./routes/forgetpass"));
 app.use("/purchase",authenticateToken, require("./routes/purchase"));
 app.use("/api", require("./routes/auth"));
 app.use("/", require("./routes/dashboard"));

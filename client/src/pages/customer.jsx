@@ -179,6 +179,7 @@ const Customer = () => {
   };
 
   const handleDelete = async (id) => {
+    
     try {
       const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/customer/${id}`, {
         method: "DELETE",
